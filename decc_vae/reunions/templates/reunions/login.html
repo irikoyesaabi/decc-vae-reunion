@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion — DECC/VAE</title>
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/decc.css' %}">
+</head>
+<body class="login-body">
+<div class="login-card">
+    <div class="login-header">
+        <div class="brand-mark">DECC</div>
+        <h1>DECC / VAE</h1>
+        <p>Direction des Examens, Concours, Certifications et VAE<br>MEFPT — République du Niger</p>
+    </div>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <label class="form-label" for="username">Identifiant</label>
+        <input class="form-control" id="username" name="username" required autofocus>
+        <label class="form-label mt-3" for="password">Mot de passe</label>
+        <input class="form-control" id="password" name="password" type="password" required>
+        <button class="btn btn-decc w-100 mt-4" type="submit">Se connecter</button>
+    </form>
+    <p class="login-hint">Compte par défaut : admin / admin123</p>
+</div>
+</body>
+</html>

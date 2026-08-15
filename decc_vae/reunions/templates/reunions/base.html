@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}DECC/VAE — Réunions{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/decc.css' %}">
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">DECC</div>
+            <div>
+                <strong>DECC / VAE</strong>
+                <small>Gestion des réunions</small>
+            </div>
+        </div>
+        <nav>
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Tableau de bord</a>
+            <a href="{% url 'reunion_list' %}" class="{% if request.resolver_match.url_name == 'reunion_list' %}active{% endif %}">Mes réunions</a>
+            <a href="{% url 'reunion_create' %}" class="{% if request.resolver_match.url_name == 'reunion_create' %}active{% endif %}">Nouvelle réunion</a>
+            <a href="{% url 'logout' %}">Déconnexion</a>
+        </nav>
+        <div class="sidebar-foot">
+            <span>{{ request.user.username }}</span>
+            <small>MEFPT — Niger</small>
+        </div>
+    </aside>
+    <main class="main">
+        <header class="topbar">
+            <button class="btn-menu" type="button" id="btnMenu" aria-label="Menu">☰</button>
+            <h1>{% block page_title %}Tableau de bord{% endblock %}</h1>
+        </header>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+<script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

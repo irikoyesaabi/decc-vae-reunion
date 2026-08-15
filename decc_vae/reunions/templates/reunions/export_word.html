@@ -1,0 +1,15 @@
+<!-- Gabarit de référence pour l'export Word (génération réelle via python-docx dans export_word.py). -->
+<html>
+<head><meta charset="utf-8"><title>Compte rendu Word</title></head>
+<body>
+  <h1>DECC/VAE — Compte rendu</h1>
+  <p>Réunion du {{ reunion.date }} — {{ reunion.get_type_display }}</p>
+  <p>Président : {{ reunion.president }} | Rapporteur : {{ reunion.rapporteur }}</p>
+  <h2>Points</h2>
+  <table border="1">
+    {% for p in reunion.points.all %}
+    <tr><td>{{ p.numero }}</td><td>{{ p.sujet }}</td><td>{{ p.urgence }}</td></tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

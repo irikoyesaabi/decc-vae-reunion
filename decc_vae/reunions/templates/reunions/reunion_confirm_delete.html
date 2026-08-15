@@ -1,0 +1,14 @@
+{% extends "reunions/base.html" %}
+{% block title %}Supprimer la réunion{% endblock %}
+{% block page_title %}Confirmer la suppression{% endblock %}
+{% block content %}
+<div class="panel">
+    <p>Voulez-vous vraiment supprimer la réunion du <strong>{{ reunion.date|date:"d/m/Y" }}</strong> ({{ reunion.get_type_display }}) ?</p>
+    <p class="text-danger">Tous les points associés seront également supprimés.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Oui, supprimer</button>
+        <a class="btn btn-outline-secondary" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
+    </form>
+</div>
+{% endblock %}

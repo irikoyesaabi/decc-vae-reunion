@@ -1,0 +1,56 @@
+{% extends "reunions/base.html" %}
+{% block title %}{{ titre }}{% endblock %}
+{% block page_title %}{{ titre }}{% endblock %}
+{% block content %}
+<form method="post" class="panel">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <h2>Informations générales</h2>
+    <div class="row g-3">
+        <div class="col-md-3">{{ form.date.label_tag }}{{ form.date }} {{ form.date.errors }}</div>
+        <div class="col-md-2">{{ form.heure_debut.label_tag }}{{ form.heure_debut }} {{ form.heure_debut.errors }}</div>
+        <div class="col-md-2">{{ form.heure_fin.label_tag }}{{ form.heure_fin }} {{ form.heure_fin.errors }}</div>
+        <div class="col-md-5">{{ form.lieu.label_tag }}{{ form.lieu }} {{ form.lieu.errors }}</div>
+        <div class="col-md-3">{{ form.type.label_tag }}{{ form.type }} {{ form.type.errors }}</div>
+        <div class="col-md-3">{{ form.president.label_tag }}{{ form.president }} {{ form.president.errors }}</div>
+        <div class="col-md-3">{{ form.rapporteur.label_tag }}{{ form.rapporteur }} {{ form.rapporteur.errors }}</div>
+        <div class="col-md-3">{{ form.nombre_participants.label_tag }}{{ form.nombre_participants }} {{ form.nombre_participants.errors }}</div>
+        <div class="col-md-4">{{ form.participants_presents.label_tag }}{{ form.participants_presents }}</div>
+        <div class="col-md-4">{{ form.participants_excuses.label_tag }}{{ form.participants_excuses }}</div>
+        <div class="col-md-4">{{ form.participants_absents.label_tag }}{{ form.participants_absents }}</div>
+        <div class="col-md-3">{{ form.prochaine_reunion.label_tag }}{{ form.prochaine_reunion }}</div>
+        <div class="col-md-9">{{ form.objet_prochaine.label_tag }}{{ form.objet_prochaine }}</div>
+        <div class="col-12">{{ form.observations.label_tag }}{{ form.observations }}</div>
+    </div>
+
+    <h2 class="mt-4">Points de réunion</h2>
+    {{ formset.non_form_errors }}
+    {% for f in formset %}
+        <fieldset class="point-block">
+            {% if f.id %}{{ f.id }}{% endif %}
+            <legend>Point {% if f.instance.pk %}n° {{ f.instance.numero }}{% else %}nouveau{% endif %}</legend>
+            <div class="row g-2">
+                <div class="col-md-2">{{ f.rubrique.label_tag }}{{ f.rubrique }}</div>
+                <div class="col-md-2">{{ f.service.label_tag }}{{ f.service }}</div>
+                <div class="col-md-2">{{ f.urgence.label_tag }}{{ f.urgence }}</div>
+                <div class="col-md-2">{{ f.statut.label_tag }}{{ f.statut }}</div>
+                <div class="col-md-2">{{ f.delai.label_tag }}{{ f.delai }}</div>
+                <div class="col-md-2">{{ f.responsable.label_tag }}{{ f.responsable }}</div>
+                <div class="col-12">{{ f.sujet.label_tag }}{{ f.sujet }}</div>
+                <div class="col-md-6">{{ f.decision.label_tag }}{{ f.decision }}</div>
+                <div class="col-md-6">{{ f.action.label_tag }}{{ f.action }}</div>
+                {% if formset.can_delete %}
+                <div class="col-12">
+                    <label class="form-check-label">{{ f.DELETE }} Supprimer ce point</label>
+                </div>
+                {% endif %}
+            </div>
+            {{ f.non_field_errors }}
+        </fieldset>
+    {% endfor %}
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-decc" type="submit">Enregistrer</button>
+        <a class="btn btn-outline-secondary" href="{% if reunion %}{% url 'reunion_detail' reunion.pk %}{% else %}{% url 'reunion_list' %}{% endif %}">Annuler</a>
+    </div>
+</form>
+{% endblock %}

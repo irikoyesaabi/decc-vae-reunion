@@ -1,0 +1,70 @@
+{% extends "reunions/base.html" %}
+{% block title %}Réunion du {{ reunion.date|date:"d/m/Y" }}{% endblock %}
+{% block page_title %}Réunion du {{ reunion.date|date:"d/m/Y" }}{% endblock %}
+{% block content %}
+<div class="toolbar">
+    <a class="btn btn-decc" href="{% url 'reunion_update' reunion.pk %}">Modifier</a>
+    <a class="btn btn-outline-danger" href="{% url 'reunion_delete' reunion.pk %}">Supprimer</a>
+    <a class="btn btn-outline-decc" href="{% url 'export_pdf' reunion.pk %}">PDF</a>
+    <a class="btn btn-outline-decc" href="{% url 'export_word' reunion.pk %}">Word</a>
+    <a class="btn btn-outline-decc" href="{% url 'export_excel' reunion.pk %}">Excel</a>
+    <a class="btn btn-outline-secondary" href="{% url 'reunion_list' %}">Retour à la liste</a>
+</div>
+
+<div class="panel">
+    <h2>Informations générales</h2>
+    <dl class="info-grid">
+        <dt>Type</dt><dd>{{ reunion.get_type_display }}</dd>
+        <dt>Horaire</dt><dd>{{ reunion.heure_debut|time:"H:i" }}{% if reunion.heure_fin %} – {{ reunion.heure_fin|time:"H:i" }}{% endif %}</dd>
+        <dt>Lieu</dt><dd>{{ reunion.lieu }}</dd>
+        <dt>Président</dt><dd>{{ reunion.president }}</dd>
+        <dt>Rapporteur</dt><dd>{{ reunion.rapporteur }}</dd>
+        <dt>Participants</dt><dd>{{ reunion.nombre_participants }}</dd>
+        <dt>Prochaine</dt><dd>{% if reunion.prochaine_reunion %}{{ reunion.prochaine_reunion|date:"d/m/Y" }}{% else %}—{% endif %}</dd>
+        <dt>Objet prochaine</dt><dd>{{ reunion.objet_prochaine|default:"—" }}</dd>
+    </dl>
+    <p><strong>Présents :</strong> {{ reunion.participants_presents|default:"—" }}</p>
+    <p><strong>Excusés :</strong> {{ reunion.participants_excuses|default:"—" }}</p>
+    <p><strong>Absents :</strong> {{ reunion.participants_absents|default:"—" }}</p>
+    {% if reunion.observations %}<p><strong>Observations :</strong> {{ reunion.observations }}</p>{% endif %}
+</div>
+
+<div class="panel">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">Points</h2>
+        <a class="btn btn-sm btn-decc" href="{% url 'point_create' reunion.pk %}">Ajouter un point</a>
+    </div>
+    <div class="table-wrap">
+    <table class="table table-sm align-middle">
+        <thead>
+            <tr>
+                <th>N°</th><th>Rubrique</th><th>Service</th><th>Sujet</th>
+                <th>Décision</th><th>Action</th><th>Resp.</th><th>Délai</th><th>Urg.</th><th>Statut</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in reunion.points.all %}
+            <tr class="{% if p.urgence == 5 %}row-critical{% endif %}">
+                <td>{{ p.numero }}</td>
+                <td>{{ p.get_rubrique_display }}</td>
+                <td>{{ p.get_service_display }}</td>
+                <td>{{ p.sujet }}</td>
+                <td>{{ p.decision }}</td>
+                <td>{{ p.action }}</td>
+                <td>{{ p.responsable }}</td>
+                <td>{% if p.delai %}{{ p.delai|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+                <td><span class="badge urg-{{ p.urgence }}">{{ p.urgence }}</span></td>
+                <td>{{ p.get_statut_display }}</td>
+                <td class="text-nowrap">
+                    <a href="{% url 'point_update' p.pk %}">Modifier</a>
+                    <a class="text-danger" href="{% url 'point_delete' p.pk %}">Supprimer</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="11">Aucun point. Ajoutez le premier point de l’ordre du jour.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}

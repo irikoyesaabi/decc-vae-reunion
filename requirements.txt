@@ -1,0 +1,10 @@
+# DECC/VAE - dépendances (installation via python embarqué)
+Django==4.2.25
+django-crispy-forms==2.1
+crispy-bootstrap5==0.7
+reportlab==4.2.5
+openpyxl==3.1.5
+python-docx==1.1.2
+Pillow==10.4.0
+python-decouple==3.8
+python-dateutil==2.9.0.post0
