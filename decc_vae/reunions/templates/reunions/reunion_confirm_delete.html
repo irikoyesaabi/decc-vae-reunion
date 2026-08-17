@@ -3,12 +3,12 @@
 {% block page_title %}Confirmer la suppression{% endblock %}
 {% block content %}
 <div class="panel">
-    <p>Voulez-vous vraiment supprimer la réunion du <strong>{{ reunion.date|date:"d/m/Y" }}</strong> ({{ reunion.get_type_display }}) ?</p>
+    <p>Supprimer la réunion du <strong>{{ reunion.date|date:"d/m/Y" }}</strong> ({{ reunion.get_type_label }}) ?</p>
     <p class="text-danger">Tous les points associés seront également supprimés.</p>
     <form method="post">
         {% csrf_token %}
-        <button class="btn btn-danger" type="submit">Oui, supprimer</button>
-        <a class="btn btn-outline-secondary" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
+        <button class="btn btn-success" type="submit">Enregistrer la suppression</button>
+        <a class="btn btn-secondary" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
     </form>
 </div>
 {% endblock %}

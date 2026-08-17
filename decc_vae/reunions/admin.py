@@ -11,13 +11,13 @@ class PointInline(admin.TabularInline):
 @admin.register(Reunion)
 class ReunionAdmin(admin.ModelAdmin):
     list_display = ("date", "type", "lieu", "president", "rapporteur", "nombre_participants")
-    list_filter = ("type", "date")
-    search_fields = ("president", "rapporteur", "lieu", "observations")
+    list_filter = ("type", "lieu", "date")
+    search_fields = ("president", "rapporteur", "observations")
     inlines = [PointInline]
 
 
 @admin.register(Point)
 class PointAdmin(admin.ModelAdmin):
-    list_display = ("numero", "reunion", "rubrique", "service", "urgence", "statut", "responsable")
-    list_filter = ("service", "urgence", "statut", "rubrique")
+    list_display = ("numero", "reunion", "rubrique", "volet", "urgence", "statut", "responsable")
+    list_filter = ("volet", "urgence", "statut", "rubrique")
     search_fields = ("sujet", "decision", "action", "responsable")

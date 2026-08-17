@@ -1,9 +1,30 @@
 document.getElementById("btnMenu")?.addEventListener("click", () => {
   document.querySelector(".sidebar")?.classList.toggle("open");
 });
-document.querySelectorAll("[data-bs-dismiss='alert']").forEach((btn) => {
-  btn.addEventListener("click", () => btn.closest(".alert")?.remove());
-});
+
+function toggleAutre(select, wrap, value) {
+  if (!select || !wrap) return;
+  wrap.style.display = select.value === value ? "" : "none";
+}
+
+function initAutreFields() {
+  const typeSel = document.getElementById("id_type");
+  toggleAutre(typeSel, document.querySelector(".js-type-autre"), "autre");
+  typeSel?.addEventListener("change", () =>
+    toggleAutre(typeSel, document.querySelector(".js-type-autre"), "autre")
+  );
+  const lieuSel = document.getElementById("id_lieu");
+  toggleAutre(lieuSel, document.querySelector(".js-lieu-autre"), "autre");
+  lieuSel?.addEventListener("change", () =>
+    toggleAutre(lieuSel, document.querySelector(".js-lieu-autre"), "autre")
+  );
+  document.querySelectorAll(".js-volet").forEach((sel) => {
+    const wrap = sel.closest(".row, .point-block, form")?.querySelector(".js-volet-wrap");
+    toggleAutre(sel, wrap, "autre");
+    sel.addEventListener("change", () => toggleAutre(sel, wrap, "autre"));
+  });
+}
+initAutreFields();
 
 const PALETTE = ["#0b2545", "#1d4e89", "#c9a227", "#c0392b", "#1e7a46", "#3d7ea6", "#6c7a89"];
 

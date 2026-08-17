@@ -1,0 +1,16 @@
+{% extends "reunions/base.html" %}
+{% block title %}Fusion de bases{% endblock %}
+{% block page_title %}Concaténation de bases SQLite{% endblock %}
+{% block content %}
+<div class="panel">
+    <p>Importez un fichier <code>.sqlite3</code> provenant d'une autre clé USB. Les réunions déjà présentes (même date, heure, type et président) sont ignorées. Les identifiants sont réattribués.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.fichier.label_tag }}{{ form.fichier }}
+        <div class="mt-3 d-flex gap-2">
+            <button class="btn btn-success" type="submit">Enregistrer la fusion</button>
+            <a class="btn btn-secondary" href="{% url 'dashboard' %}">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

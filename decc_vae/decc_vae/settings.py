@@ -3,10 +3,13 @@ Configuration Django — application portable DECC/VAE (SQLite, hors ligne).
 """
 from pathlib import Path
 
-from decouple import config
+from decouple import Config, RepositoryEnv, config as _config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
+
+_env_file = ROOT_DIR / ".env"
+config = Config(RepositoryEnv(str(_env_file))) if _env_file.exists() else _config
 
 SECRET_KEY = config(
     "SECRET_KEY",
@@ -117,5 +120,26 @@ LOGOUT_REDIRECT_URL = "login"
 
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 60 * 60 * 8
+SESSION_COOKIE_AGE = config("SESSION_COOKIE_AGE", default=3600, cast=int)
 SESSION_SAVE_EVERY_REQUEST = True
+
+LOG_DIR = ROOT_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE = config("LOG_FILE", default="logs/decc_vae.log")
+log_path = Path(LOG_FILE)
+if not log_path.is_absolute():
+    log_path = ROOT_DIR / log_path
+log_path.parent.mkdir(parents=True, exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": str(log_path),
+            "level": config("LOG_LEVEL", default="INFO"),
+        },
+    },
+    "root": {"handlers": ["file"], "level": config("LOG_LEVEL", default="INFO")},
+}

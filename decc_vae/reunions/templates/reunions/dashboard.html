@@ -10,24 +10,15 @@
     <article class="stat-card"><span>En cours</span><strong>{{ stats.nb_en_cours }}</strong></article>
     <article class="stat-card"><span>À faire</span><strong>{{ stats.nb_a_faire }}</strong></article>
 </div>
-
-<div class="row g-3 mt-1">
-    <div class="col-lg-6"><div class="panel"><h2>Réunions par type</h2><canvas id="chartTypes" height="180"></canvas></div></div>
-    <div class="col-lg-6"><div class="panel"><h2>Évolution mensuelle</h2><canvas id="chartMois" height="180"></canvas></div></div>
-    <div class="col-lg-6"><div class="panel"><h2>Points par service</h2><canvas id="chartServices" height="180"></canvas></div></div>
-    <div class="col-lg-6"><div class="panel"><h2>Niveaux d'urgence</h2><canvas id="chartUrgences" height="180"></canvas></div></div>
-</div>
-
+<div class="panel mt-3"><h2>Répartition par volet</h2><canvas id="chartVolets" height="180"></canvas></div>
 <div class="row g-3 mt-1">
     <div class="col-lg-6">
         <div class="panel">
-            <h2>5 dernières réunions</h2>
+            <h2>10 dernières réunions</h2>
             <ul class="list-plain">
                 {% for r in dernieres %}
-                    <li><a href="{% url 'reunion_detail' r.pk %}">{{ r.date|date:"d/m/Y" }} — {{ r.get_type_display }}</a><small>{{ r.president }}</small></li>
-                {% empty %}
-                    <li>Aucune réunion enregistrée.</li>
-                {% endfor %}
+                    <li><a href="{% url 'reunion_detail' r.pk %}">{{ r.date|date:"d/m/Y" }} — {{ r.get_type_label }}</a><small>{{ r.president }}</small></li>
+                {% empty %}<li>Aucune réunion enregistrée.</li>{% endfor %}
             </ul>
         </div>
     </div>
@@ -38,11 +29,9 @@
                 {% for p in points_critiques %}
                     <li>
                         <a href="{% url 'reunion_detail' p.reunion_id %}">{{ p.sujet|truncatechars:80 }}</a>
-                        <small>{{ p.reunion.date|date:"d/m/Y" }} · {{ p.get_service_display }} · {{ p.get_statut_display }}</small>
+                        <small>{{ p.reunion.date|date:"d/m/Y" }} · {{ p.get_volet_label }} · {{ p.get_statut_display }}</small>
                     </li>
-                {% empty %}
-                    <li>Aucun point critique.</li>
-                {% endfor %}
+                {% empty %}<li>Aucun point critique.</li>{% endfor %}
             </ul>
         </div>
     </div>
@@ -50,15 +39,7 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-const charts = {
-  types: {{ chart_types|safe }},
-  mois: {{ chart_mois|safe }},
-  services: {{ chart_services|safe }},
-  urgences: {{ chart_urgences|safe }}
-};
-drawPie("chartTypes", charts.types.labels, charts.types.data);
-drawBars("chartMois", charts.mois.labels, charts.mois.data);
-drawPie("chartServices", charts.services.labels, charts.services.data);
-drawBars("chartUrgences", ["1","2","3","4","5"], charts.urgences);
+const volets = {{ chart_volets|safe }};
+drawPie("chartVolets", volets.labels, volets.data);
 </script>
 {% endblock %}

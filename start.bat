@@ -5,8 +5,9 @@ color 0B
 set "ROOT_DIR=%~dp0"
 cd /d "%ROOT_DIR%"
 
-if not exist "%ROOT_DIR%python\python.exe" (
-    echo [ERREUR] Python embarque introuvable.
+call "%ROOT_DIR%python_env.bat"
+if not defined PYTHON_EXE (
+    echo [ERREUR] Python Standalone introuvable dans python\
     echo Executez d'abord install.bat
     pause
     exit /b 1
@@ -17,8 +18,6 @@ if not exist "%ROOT_DIR%decc_vae\manage.py" (
     pause
     exit /b 1
 )
-
-set "PYTHON_EXE=%ROOT_DIR%python\python.exe"
 
 echo.
 echo ================================================================

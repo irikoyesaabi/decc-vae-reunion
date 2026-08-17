@@ -1,19 +1,36 @@
-"""Vues CRUD, tableau de bord, filtres et exports — DECC/VAE."""
+"""Vues CRUD, tableau de bord, filtres, import, rapport et fusion."""
 import json
+import tempfile
+from pathlib import Path
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Count, Q
-from django.db.models.functions import TruncMonth
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.safestring import mark_safe
 
-from .export_excel import export_all_reunions_xlsx, export_reunion_xlsx
-from .export_pdf import export_reunion_pdf
-from .export_word import export_reunion_docx
-from .forms import PointForm, PointFormSet, ReunionFilterForm, ReunionForm
+from .export_utils import (
+    excel_template,
+    export_all_reunions_xlsx,
+    export_rapport_pdf,
+    export_rapport_word,
+    export_reunion_docx,
+    export_reunion_pdf,
+    export_reunion_xlsx,
+    import_points_from_xlsx,
+)
+from .forms import (
+    ImportExcelForm,
+    MergeDbForm,
+    PointForm,
+    PointFormSet,
+    RapportForm,
+    ReunionFilterForm,
+    ReunionForm,
+)
+from .merge_db import merge_sqlite_file
 from .models import Point, Reunion
 
 
@@ -52,44 +69,20 @@ def dashboard(request):
         "nb_en_cours": points.filter(statut=Point.STATUT_EN_COURS).count(),
         "nb_a_faire": points.filter(statut=Point.STATUT_A_FAIRE).count(),
     }
-    types = list(
-        reunions.values("type").annotate(total=Count("id")).order_by("type")
-    )
-    type_labels = dict(Reunion.TYPE_CHOICES)
-    chart_types = {
-        "labels": [type_labels.get(row["type"], row["type"]) for row in types],
-        "data": [row["total"] for row in types],
+    volets = list(points.values("volet").annotate(total=Count("id")).order_by("volet"))
+    volet_labels = dict(Point.VOLET_CHOICES)
+    chart_volets = {
+        "labels": [volet_labels.get(row["volet"], row["volet"]) for row in volets],
+        "data": [row["total"] for row in volets],
     }
-    by_month = (
-        reunions.annotate(mois=TruncMonth("date"))
-        .values("mois")
-        .annotate(total=Count("id"))
-        .order_by("mois")
-    )
-    chart_mois = {
-        "labels": [row["mois"].strftime("%m/%Y") if row["mois"] else "" for row in by_month],
-        "data": [row["total"] for row in by_month],
-    }
-    services = list(points.values("service").annotate(total=Count("id")).order_by("service"))
-    service_labels = dict(Point.SERVICE_CHOICES)
-    chart_services = {
-        "labels": [service_labels.get(row["service"], row["service"]) for row in services],
-        "data": [row["total"] for row in services],
-    }
-    urgences = []
-    for level in range(1, 6):
-        urgences.append(points.filter(urgence=level).count())
     return render(
         request,
         "reunions/dashboard.html",
         {
             "stats": stats,
-            "dernieres": reunions[:5],
+            "dernieres": reunions[:10],
             "points_critiques": points.filter(urgence=5).select_related("reunion")[:15],
-            "chart_types": mark_safe(json.dumps(chart_types)),
-            "chart_mois": mark_safe(json.dumps(chart_mois)),
-            "chart_services": mark_safe(json.dumps(chart_services)),
-            "chart_urgences": mark_safe(json.dumps(urgences)),
+            "chart_volets": mark_safe(json.dumps(chart_volets)),
         },
     )
 
@@ -105,8 +98,8 @@ def _filtered_reunions(request):
             qs = qs.filter(date__lte=data["date_fin"])
         if data.get("type"):
             qs = qs.filter(type__in=data["type"])
-        if data.get("service"):
-            qs = qs.filter(points__service=data["service"]).distinct()
+        if data.get("volet"):
+            qs = qs.filter(points__volet=data["volet"]).distinct()
         if data.get("urgence"):
             qs = qs.filter(points__urgence=int(data["urgence"])).distinct()
         if data.get("statut"):
@@ -116,9 +109,9 @@ def _filtered_reunions(request):
             qs = qs.filter(
                 Q(president__icontains=q)
                 | Q(rapporteur__icontains=q)
-                | Q(lieu__icontains=q)
                 | Q(observations__icontains=q)
                 | Q(objet_prochaine__icontains=q)
+                | Q(type_autre_precision__icontains=q)
                 | Q(points__sujet__icontains=q)
             ).distinct()
     return form, qs
@@ -242,8 +235,8 @@ def point_delete(request, pk):
 
 def export_pdf(request, pk):
     reunion = get_object_or_404(Reunion.objects.prefetch_related("points"), pk=pk)
-    buffer = export_reunion_pdf(reunion)
-    response = HttpResponse(buffer.getvalue(), content_type="application/pdf")
+    data = export_reunion_pdf(reunion)
+    response = HttpResponse(data, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="reunion_{reunion.date}_{reunion.pk}.pdf"'
     return response
 
@@ -279,3 +272,89 @@ def export_excel_all(request):
     )
     response["Content-Disposition"] = 'attachment; filename="decc_vae_reunions.xlsx"'
     return response
+
+
+def download_excel_template(request):
+    buffer = excel_template()
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = 'attachment; filename="modele_points_decc_vae.xlsx"'
+    return response
+
+
+def import_excel(request, pk):
+    reunion = get_object_or_404(Reunion, pk=pk)
+    if request.method == "POST":
+        form = ImportExcelForm(request.POST, request.FILES)
+        if form.is_valid():
+            created, errors = import_points_from_xlsx(reunion, form.cleaned_data["fichier"])
+            if created:
+                messages.success(request, f"{created} point(s) importé(s).")
+            for err in errors:
+                messages.warning(request, err)
+            if created:
+                return redirect("reunion_detail", pk=reunion.pk)
+    else:
+        form = ImportExcelForm()
+    return render(request, "reunions/import_excel.html", {"form": form, "reunion": reunion})
+
+
+def rapport_complet(request):
+    form = RapportForm(request.GET or None)
+    reunions = Reunion.objects.none()
+    if form.is_valid() and (form.cleaned_data.get("date_debut") or form.cleaned_data.get("date_fin") or request.GET):
+        reunions = Reunion.objects.all().prefetch_related("points")
+        if form.cleaned_data.get("date_debut"):
+            reunions = reunions.filter(date__gte=form.cleaned_data["date_debut"])
+        if form.cleaned_data.get("date_fin"):
+            reunions = reunions.filter(date__lte=form.cleaned_data["date_fin"])
+        if request.GET.get("download"):
+            fmt = form.cleaned_data.get("format") or "pdf"
+            if fmt == "word":
+                buffer = export_rapport_word(reunions)
+                response = HttpResponse(
+                    buffer.getvalue(),
+                    content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                )
+                response["Content-Disposition"] = 'attachment; filename="rapport_decc_vae.docx"'
+                return response
+            data = export_rapport_pdf(reunions)
+            response = HttpResponse(data, content_type="application/pdf")
+            response["Content-Disposition"] = 'attachment; filename="rapport_decc_vae.pdf"'
+            return response
+    return render(
+        request,
+        "reunions/rapport_complet.html",
+        {"form": form, "reunions": reunions},
+    )
+
+
+def merge_databases(request):
+    if request.method == "POST":
+        form = MergeDbForm(request.POST, request.FILES)
+        if form.is_valid():
+            uploaded = form.cleaned_data["fichier"]
+            with tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False) as tmp:
+                for chunk in uploaded.chunks():
+                    tmp.write(chunk)
+                tmp_path = Path(tmp.name)
+            try:
+                summary = merge_sqlite_file(tmp_path)
+                messages.success(
+                    request,
+                    (
+                        f"Fusion terminée : {summary['reunions_ajoutees']} réunion(s) ajoutée(s), "
+                        f"{summary['points_ajoutes']} point(s), "
+                        f"{summary['doublons']} doublon(s) ignoré(s)."
+                    ),
+                )
+            except Exception as exc:
+                messages.error(request, f"Fusion impossible : {exc}")
+            finally:
+                tmp_path.unlink(missing_ok=True)
+            return redirect("merge_db")
+    else:
+        form = MergeDbForm()
+    return render(request, "reunions/merge_db.html", {"form": form})

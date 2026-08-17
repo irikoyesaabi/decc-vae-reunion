@@ -1,57 +1,45 @@
 APPLICATION DECC/VAE — GESTION DES RÉUNIONS
 ===========================================
 
-Application portable (clé USB) de suivi des réunions de la Direction
-DECC/VAE du Ministère de l'Enseignement et de la Formation Techniques
-et Professionnels (Niger).
+Application portable (clé USB) pour la Direction DECC/VAE,
+Ministère de l'Éducation Nationale (Niger).
 
-FONCTIONNEMENT HORS LIGNE
--------------------------
-Aucune installation de Python sur le PC n'est nécessaire. L'application
-utilise un Python embarqué dans le dossier python\.
+Python embarqué : dossier python\ (Standalone Build 3.11)
+Base par défaut : SQLite (decc_vae\data\db.sqlite3)
+PostgreSQL : DATABASE_ENGINE=postgresql dans .env
 
 PREMIÈRE UTILISATION (Windows 64 bits)
 --------------------------------------
 1. Copiez tout le dossier sur la clé USB.
-2. (Recommandé hors ligne) Placez vc_redist.x64.exe dans vendor\
-   (Visual C++ Redistributable 2015-2022 x64).
-3. Double-cliquez sur install.bat (une seule fois).
-   - Vérifie / installe Microsoft Visual C++ Redistributable
-   - Télécharge Python Standalone si absent
-   - Installe les dépendances Django
-   - Crée la base SQLite et le compte admin
-4. Double-cliquez sur start.bat pour lancer le serveur.
-5. Le navigateur s'ouvre sur http://127.0.0.1:8000
-6. Connexion : admin / admin123
-   (changez ce mot de passe dès que possible via /admin/)
+2. Placez vc_redist.x64.exe dans redist\ (recommandé hors ligne).
+3. Double-cliquez sur install.bat (une fois).
+4. Lancement sans fenêtre : double-cliquez sur launch.vbs
+   Lancement avec fenêtre : start.bat ou run.bat
+5. Navigateur : http://127.0.0.1:8000
+6. Compte : admin / admin123  (à changer via /admin/)
+
+SCRIPTS
+-------
+install.bat       Installation (VC++, pip, migrations, admin)
+start.bat         Serveur + navigateur (fenêtre visible)
+run.bat           Alias de start.bat
+launch.vbs        Serveur masqué (pas de fenêtre terminal)
+stop.bat          Arrêt du processus sur le port 8000
+check_install.bat Vérification Python / Django / VC++ / base
+update.bat        Mise à jour des paquets et migrations (sans écraser la base)
+
+FONCTIONS
+---------
+- Réunions et points (CRUD)
+- Volets : Examens, Concours, Certifications, VAE, Gestion des Données, Autre
+- Types : Ordinaire, Extraordinaire, Direction/Général, Suivi, Préparation, Post-examens, Autre
+- Champs « Autre à préciser » (type, lieu, volet)
+- Filtres période / type / volet / urgence / statut + recherche
+- Exports PDF, Word, Excel (une réunion ou toutes)
+- Import Excel des points + modèle
+- Rapport de période (PDF ou Word)
+- Fusion de bases SQLite (menu Fusion SQLite)
 
 ARRÊT
 -----
-- CTRL+C dans la fenêtre du serveur, ou double-clic sur stop.bat
-
-UTILISATION
------------
-- Tableau de bord : statistiques et points critiques
-- Mes réunions : liste, recherche, filtres (dates, type, service, urgence, statut)
-- Nouvelle réunion : informations générales + points de l'ordre du jour
-- Détail : modification, suppression, exports PDF / Word / Excel
-- Export Excel global : bouton sur la liste (respecte les filtres actifs)
-
-COMPTES
--------
-Les comptes se gèrent dans l'interface d'administration Django :
-  http://127.0.0.1:8000/admin/
-
-DONNÉES
--------
-Base SQLite : decc_vae\data\db.sqlite3
-Sauvegardez ce fichier pour conserver l'historique.
-
-DÉPENDANCES TECHNIQUES
-----------------------
-- Windows 10/11 64 bits
-- Microsoft Visual C++ Redistributable 2015-2022 (x64)
-- Python Standalone 3.11 (dossier python\)
-
-En cas de problème d'import de modules natifs (Pillow, ReportLab),
-installez le Redistributable puis relancez install.bat.
+stop.bat, ou fermez le processus python de runserver.

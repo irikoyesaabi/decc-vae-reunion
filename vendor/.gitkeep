@@ -1,0 +1,4 @@
+# Conservé volontairement presque vide : Git ne versionne pas les dossiers vides.
+# Placez ici vc_redist.x64.exe pour une installation hors ligne du
+# Microsoft Visual C++ Redistributable 2015-2022 (x64).
+# https://aka.ms/vs/17/release/vc_redist.x64.exe

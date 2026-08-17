@@ -48,6 +48,8 @@ a { color: var(--accent); text-decoration: none; }
   font-size: .9rem; cursor: pointer; background: #fff;
 }
 .btn-decc, .btn-primary { background: var(--navy); color: #fff; }
+.btn-success { background: #1e7a46; color: #fff; font-weight: 600; }
+.btn-secondary { background: #5c6b7a; color: #fff; }
 .btn-outline-decc { border-color: var(--navy); color: var(--navy); }
 .btn-outline-secondary { border-color: #c5d0db; color: #445; }
 .btn-outline-danger, .btn-danger { background: var(--danger); color: #fff; }

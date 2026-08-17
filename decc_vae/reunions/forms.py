@@ -12,7 +12,9 @@ class ReunionForm(forms.ModelForm):
             "heure_debut",
             "heure_fin",
             "lieu",
+            "lieu_precision",
             "type",
+            "type_autre_precision",
             "president",
             "rapporteur",
             "nombre_participants",
@@ -27,8 +29,12 @@ class ReunionForm(forms.ModelForm):
             "date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "heure_debut": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
             "heure_fin": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
-            "lieu": forms.TextInput(attrs={"class": "form-control"}),
-            "type": forms.Select(attrs={"class": "form-select"}),
+            "lieu": forms.Select(attrs={"class": "form-select", "id": "id_lieu"}),
+            "lieu_precision": forms.TextInput(attrs={"class": "form-control", "id": "id_lieu_precision"}),
+            "type": forms.Select(attrs={"class": "form-select", "id": "id_type"}),
+            "type_autre_precision": forms.TextInput(
+                attrs={"class": "form-control", "id": "id_type_autre_precision"}
+            ),
             "president": forms.TextInput(attrs={"class": "form-control"}),
             "rapporteur": forms.TextInput(attrs={"class": "form-control"}),
             "nombre_participants": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
@@ -36,7 +42,7 @@ class ReunionForm(forms.ModelForm):
             "participants_excuses": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
             "participants_absents": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
             "prochaine_reunion": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
-            "objet_prochaine": forms.TextInput(attrs={"class": "form-control"}),
+            "objet_prochaine": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
             "observations": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
 
@@ -46,7 +52,8 @@ class PointForm(forms.ModelForm):
         model = Point
         fields = [
             "rubrique",
-            "service",
+            "volet",
+            "volet_autre_precision",
             "sujet",
             "decision",
             "action",
@@ -57,7 +64,8 @@ class PointForm(forms.ModelForm):
         ]
         widgets = {
             "rubrique": forms.Select(attrs={"class": "form-select"}),
-            "service": forms.Select(attrs={"class": "form-select"}),
+            "volet": forms.Select(attrs={"class": "form-select js-volet"}),
+            "volet_autre_precision": forms.TextInput(attrs={"class": "form-control js-volet-autre"}),
             "sujet": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
             "decision": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
             "action": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
@@ -96,11 +104,11 @@ class ReunionFilterForm(forms.Form):
         widget=forms.SelectMultiple(attrs={"class": "form-select", "size": "4"}),
         label="Type",
     )
-    service = forms.ChoiceField(
+    volet = forms.ChoiceField(
         required=False,
-        choices=[("", "Tous les services")] + list(Point.SERVICE_CHOICES),
+        choices=[("", "Tous les volets")] + list(Point.VOLET_CHOICES),
         widget=forms.Select(attrs={"class": "form-select"}),
-        label="Service",
+        label="Volet",
     )
     urgence = forms.ChoiceField(
         required=False,
@@ -117,7 +125,40 @@ class ReunionFilterForm(forms.Form):
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Rechercher (président, lieu, objet…)"}
+            attrs={"class": "form-control", "placeholder": "Rechercher (président, sujet…)"}
         ),
         label="Recherche",
+    )
+
+
+class ImportExcelForm(forms.Form):
+    fichier = forms.FileField(
+        label="Fichier Excel (.xlsx)",
+        widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": ".xlsx"}),
+    )
+
+
+class RapportForm(forms.Form):
+    date_debut = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        label="Date de début",
+    )
+    date_fin = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        label="Date de fin",
+    )
+    format = forms.ChoiceField(
+        choices=[("pdf", "PDF"), ("word", "Word")],
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Format",
+        initial="pdf",
+    )
+
+
+class MergeDbForm(forms.Form):
+    fichier = forms.FileField(
+        label="Base SQLite à fusionner (.sqlite3 / .db)",
+        widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": ".sqlite3,.db,.sqlite"}),
     )

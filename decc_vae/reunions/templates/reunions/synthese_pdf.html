@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 1.6cm 1.4cm 1.8cm 1.4cm; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 10px; color: #1a2332; }
+  h1, h2 { color: #0b2545; text-align: center; margin: 4px 0; }
+  h1 { font-size: 13px; }
+  h2 { font-size: 11px; }
+  h3 { color: #0b2545; font-size: 11px; margin: 10px 0 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  th { background: #0b2545; color: #fff; padding: 4px; font-size: 8px; }
+  td { border: 0.4px solid #9aa8b8; padding: 3px; font-size: 8px; vertical-align: top; }
+  .critique { background: #fdecea; color: #c0392b; }
+  .meta td { background: #f4f6f8; }
+  .footer { font-size: 8px; color: #5c6b7a; text-align: center; margin-top: 12px; }
+  .sig td { height: 70px; }
+</style>
+</head>
+<body>
+  <h1>RÉPUBLIQUE DU NIGER — Ministère de l'Éducation Nationale</h1>
+  <h2>DECC / VAE — {% if mode == "rapport" %}Rapport de réunions{% else %}Compte rendu de réunion{% endif %}</h2>
+
+  {% if mode == "reunion" %}
+  <table class="meta">
+    <tr><td><b>Date</b></td><td>{{ reunion.date|date:"d/m/Y" }}</td><td><b>Type</b></td><td>{{ reunion.get_type_label }}</td></tr>
+    <tr><td><b>Heure</b></td><td>{{ reunion.heure_debut|time:"H:i" }}{% if reunion.heure_fin %} – {{ reunion.heure_fin|time:"H:i" }}{% endif %}</td><td><b>Lieu</b></td><td>{{ reunion.get_lieu_label }}</td></tr>
+    <tr><td><b>Président</b></td><td>{{ reunion.president }}</td><td><b>Rapporteur</b></td><td>{{ reunion.rapporteur }}</td></tr>
+    <tr><td><b>Participants</b></td><td>{{ reunion.nombre_participants }}</td><td><b>Prochaine</b></td><td>{% if reunion.prochaine_reunion %}{{ reunion.prochaine_reunion|date:"d/m/Y" }}{% else %}—{% endif %}</td></tr>
+  </table>
+  <h3>Participants</h3>
+  <p><b>Présents :</b> {{ reunion.participants_presents|default:"—" }}</p>
+  <p><b>Excusés :</b> {{ reunion.participants_excuses|default:"—" }}</p>
+  <p><b>Absents :</b> {{ reunion.participants_absents|default:"—" }}</p>
+  {% else %}
+  <p>Nombre de réunions : {{ reunions|length }} — Points : {{ points|length }}</p>
+  {% endif %}
+
+  <h3>Points</h3>
+  <table>
+    <tr>
+      <th>N°</th><th>Rub.</th><th>Volet</th><th>Sujet</th><th>Décision</th>
+      <th>Action</th><th>Resp.</th><th>Délai</th><th>Urg.</th><th>Statut</th>
+    </tr>
+    {% for p in points %}
+    <tr class="{% if p.urgence == 5 %}critique{% endif %}">
+      <td>{{ p.numero }}</td>
+      <td>{{ p.get_rubrique_display }}</td>
+      <td>{{ p.get_volet_label }}</td>
+      <td>{{ p.sujet }}</td>
+      <td>{{ p.decision }}</td>
+      <td>{{ p.action }}</td>
+      <td>{{ p.responsable }}</td>
+      <td>{% if p.delai %}{{ p.delai|date:"d/m/Y" }}{% endif %}</td>
+      <td>{{ p.urgence }}</td>
+      <td>{{ p.get_statut_display }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  {% if mode == "reunion" %}
+  <h3>Synthèse</h3>
+  <p>{{ reunion.observations|default:"—" }} {{ reunion.objet_prochaine }}</p>
+  <table class="sig">
+    <tr><td><b>Président</b><br><br>Nom : {{ reunion.president }}<br>Signature :</td>
+        <td><b>Rapporteur</b><br><br>Nom : {{ reunion.rapporteur }}<br>Signature :</td></tr>
+  </table>
+  {% endif %}
+  <p class="footer">Généré le {{ generated|date:"d/m/Y H:i" }} — DECC/VAE</p>
+</body>
+</html>

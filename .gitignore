@@ -1,0 +1,422 @@
+# ================================================================
+# DECC/VAE - .gitignore
+# Application portable de gestion des réunions
+# Version : 1.0.0
+# ================================================================
+
+# ================================================================
+# PYTHON
+# ================================================================
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+*.pyzw
+*.pyi
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+*.egg-info/
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+*.manifest
+*.spec
+
+# PyInstaller
+*.spec
+*.exe
+*.msi
+*.whl
+
+# Coverage reports
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Profiling data
+*.prof
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+virtualenv/
+.venv/
+
+# ================================================================
+# PYTHON STANDALONE BUILD
+# ================================================================
+
+# Ne pas versionner Python Standalone Build (trop lourd)
+python/
+*.tar.gz
+*.zip
+*.7z
+*.tgz
+
+# ================================================================
+# DATABASE
+# ================================================================
+
+# SQLite
+*.sqlite3
+*.sqlite
+*.db
+*.sdb
+decc_vae/data/*.sqlite3
+decc_vae/data/*.db
+decc_vae/data/*.sqlite
+
+# PostgreSQL local
+*.pgdata
+*.postgres
+pg_hba.conf
+postgresql.conf
+
+# ================================================================
+# MEDIA FILES
+# ================================================================
+
+# Fichiers uploadés
+decc_vae/media/
+decc_vae/media/*
+media/
+uploads/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.ico
+*.tiff
+*.tif
+*.psd
+*.raw
+*.webp
+*.mp4
+*.mp3
+*.wav
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.odt
+*.ods
+*.odp
+
+# ================================================================
+# LOGS
+# ================================================================
+
+logs/
+*.log
+*.pid
+*.lock
+*.log.*
+*_log.txt
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ================================================================
+# ENVIRONMENT VARIABLES
+# ================================================================
+
+# Fichiers de configuration sensibles
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+*.env
+.env.*.local
+.env.*.backup
+
+# ================================================================
+# IDEs AND EDITORS
+# ================================================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Cursor IDE
+.cursor/
+.cursorignore
+permissions.json
+.cursorrules
+
+# PyCharm
+.idea/
+*.iml
+.idea_modules/
+*.iws
+*.ipr
+.idea/
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+.sublime/
+
+# Vim
+*.swp
+*.swo
+*~
+*.un~
+.*.swp
+.*.swo
+
+# Emacs
+*~
+\#*#
+.\#*
+
+# Visual Studio
+*.vsp
+*.vspx
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+*.tmp
+*.bak
+
+# Notepad++
+*.bak
+
+# ================================================================
+# OPERATING SYSTEM
+# ================================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+*.cache
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.rej
+*.patch
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+.document-versions/
+
+# Linux
+*.~
+.directory
+*.part
+*.swap
+
+# ================================================================
+# DJANGO
+# ================================================================
+
+# Static files
+decc_vae/staticfiles/
+decc_vae/static_root/
+decc_vae/media_root/
+static_collected/
+collected_static/
+
+# Django messages
+*.mo
+*.po~
+*.pot~
+
+# Django migrations (optionnel)
+# Décommentez pour exclure les migrations
+# decc_vae/reunions/migrations/
+# !decc_vae/reunions/migrations/__init__.py
+
+# Django local settings
+local_settings.py
+*_local_settings.py
+settings_local.py
+*_settings_local.py
+
+# Django secret key
+SECRET_KEY.txt
+.secret_key
+
+# ================================================================
+# BACKUP AND RELEASES
+# ================================================================
+
+backup_*/
+backup/
+*.bak
+*.old
+*.orig
+*.backup
+*_backup.*
+backup-*
+*.~*
+
+releases/
+release_*/
+*.tar.gz
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+*.bz2
+*.xz
+
+# ================================================================
+# TESTING
+# ================================================================
+
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# ================================================================
+# DEPLOYMENT
+# ================================================================
+
+# Deployment files
+deploy/
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.pub
+*.priv
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+docker/
+
+# ================================================================
+# MISCELLANEOUS
+# ================================================================
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+*.cached
+
+# Symlinks
+*.lnk
+*.symlink
+
+# GPG keys
+*.asc
+*.gpg
+*.pgp
+
+# ================================================================
+# PROJECT-SPECIFIC EXCLUSIONS
+# ================================================================
+
+# Decryptage : fichiers sensibles DECC/VAE
+*.decrypt
+*.encrypted
+*.enc
+
+# Rapports générés temporairement
+reports_temp/
+temp_exports/
+
+# Installer temporaires
+redist/*.exe
+!redist/README.txt
+
+# Fichiers Excel temporaires
+~$*.xlsx
+~$*.xls
+
+# Fichiers de verrouillage
+*.lock
+*.lock.*

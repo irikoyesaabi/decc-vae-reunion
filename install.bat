@@ -42,6 +42,7 @@ echo    - Installation requise pour Python et les exports PDF/Excel.
 echo.
 
 set "VCREDIST_EXE="
+if exist "%ROOT_DIR%redist\vc_redist.x64.exe" set "VCREDIST_EXE=%ROOT_DIR%redist\vc_redist.x64.exe"
 if exist "%ROOT_DIR%vendor\vc_redist.x64.exe" set "VCREDIST_EXE=%ROOT_DIR%vendor\vc_redist.x64.exe"
 if exist "%ROOT_DIR%vc_redist.x64.exe" set "VCREDIST_EXE=%ROOT_DIR%vc_redist.x64.exe"
 
@@ -80,15 +81,15 @@ echo.
 
 echo [2/7] Verification de Python Standalone Build...
 
-:: Vérifier si Python est déjà présent
-if exist "%ROOT_DIR%python\python.exe" (
-    echo    - Python Standalone Build trouve.
-    "%ROOT_DIR%python\python.exe" --version
+call "%ROOT_DIR%python_env.bat"
+if defined PYTHON_EXE (
+    echo    - Python Standalone Build trouve : %PYTHON_EXE%
+    "%PYTHON_EXE%" --version
     echo.
     goto python_present
 )
 
-echo    - Python Standalone Build non trouve.
+echo    - Python Standalone Build non trouve dans python\
 echo    - Telechargement en cours...
 echo.
 
@@ -134,16 +135,20 @@ echo    - Python Standalone Build installe avec succes.
 echo.
 
 :python_present
+call "%ROOT_DIR%python_env.bat"
 
 
 :: ============================================================
 :: 3. CONFIGURATION DE L'ENVIRONNEMENT
 :: ============================================================
 
-set "PYTHON_EXE=%ROOT_DIR%python\python.exe"
-
 echo [3/7] Verification de l'environnement Python...
-%PYTHON_EXE% --version
+if not defined PYTHON_EXE (
+    echo [ERREUR] python.exe introuvable dans python\ ou python\install\
+    pause
+    exit /b 1
+)
+"%PYTHON_EXE%" --version
 if errorlevel 1 (
     echo [ERREUR] Python ne fonctionne pas correctement.
     pause
@@ -158,7 +163,7 @@ echo.
 
 echo [4/7] Verification de pip...
 
-%PYTHON_EXE% -m pip --version >nul 2>&1
+"%PYTHON_EXE%" -m pip --version >nul 2>&1
 if errorlevel 1 (
     echo    - pip non trouve. Installation en cours...
     
@@ -171,7 +176,7 @@ if errorlevel 1 (
     )
     
     :: Installation de pip
-    %PYTHON_EXE% "%TEMP%\get-pip.py" --no-warn-script-location
+    "%PYTHON_EXE%" "%TEMP%\get-pip.py" --no-warn-script-location
     if errorlevel 1 (
         echo [ERREUR] Echec de l'installation de pip.
         pause
@@ -194,11 +199,11 @@ echo [5/7] Installation des dependances...
 
 :: Mise à jour de pip
 echo    - Mise a jour de pip...
-%PYTHON_EXE% -m pip install --no-cache-dir --upgrade pip
+"%PYTHON_EXE%" -m pip install --no-cache-dir --upgrade pip
 
 :: Installation des dépendances
 echo    - Installation des dependances (cela peut prendre quelques minutes)...
-%PYTHON_EXE% -m pip install --no-cache-dir -r requirements.txt
+"%PYTHON_EXE%" -m pip install --no-cache-dir -r requirements.txt
 if errorlevel 1 (
     echo [ERREUR] Echec de l'installation des dependances.
     pause
@@ -238,7 +243,7 @@ if not exist "%ROOT_DIR%.env" (
 
 :: Création des migrations
 echo    - Creation des migrations...
-%PYTHON_EXE% manage.py makemigrations reunions
+"%PYTHON_EXE%" manage.py makemigrations reunions
 if errorlevel 1 (
     echo [ERREUR] Echec de la creation des migrations.
     cd "%ROOT_DIR%"
@@ -248,7 +253,7 @@ if errorlevel 1 (
 
 :: Application des migrations
 echo    - Application des migrations...
-%PYTHON_EXE% manage.py migrate
+"%PYTHON_EXE%" manage.py migrate
 if errorlevel 1 (
     echo [ERREUR] Echec de l'application des migrations.
     cd "%ROOT_DIR%"
@@ -258,7 +263,7 @@ if errorlevel 1 (
 
 :: Collecte des fichiers statiques
 echo    - Collecte des fichiers statiques...
-%PYTHON_EXE% manage.py collectstatic --noinput --clear
+"%PYTHON_EXE%" manage.py collectstatic --noinput --clear
 if errorlevel 1 (
     echo [ATTENTION] Echec de la collecte des fichiers statiques.
 )
@@ -274,7 +279,7 @@ echo.
 echo [7/7] Creation du superutilisateur...
 
 cd "%ROOT_DIR%decc_vae"
-%PYTHON_EXE% create_superuser.py
+"%PYTHON_EXE%" create_superuser.py
 if errorlevel 1 (
     echo [ATTENTION] Echec de la creation du superutilisateur.
     echo Vous pourrez le creer manuellement avec : python manage.py createsuperuser
