@@ -168,3 +168,39 @@ class Point(models.Model):
             )
             self.numero = (last or 0) + 1
         super().save(*args, **kwargs)
+
+
+class Parametre(models.Model):
+    """Paramètres uniques de l'application (logo, nom)."""
+
+    logo = models.FileField(
+        upload_to="logos/",
+        blank=True,
+        null=True,
+        verbose_name="Logo personnalisé",
+    )
+    logo_actif = models.BooleanField(default=True, verbose_name="Logo actif")
+    nom_application = models.CharField(
+        max_length=100,
+        default="DECC/VAE",
+        verbose_name="Nom de l'application",
+    )
+    date_modification = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Paramètre"
+        verbose_name_plural = "Paramètres"
+
+    def __str__(self):
+        return "Paramètres de l'application"
+
+    @classmethod
+    def get_instance(cls):
+        instance, _created = cls.objects.get_or_create(pk=1)
+        return instance
+
+    @property
+    def logo_url(self):
+        if self.logo and self.logo_actif:
+            return self.logo.url
+        return None

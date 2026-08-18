@@ -24,6 +24,8 @@ urlpatterns = [
     path("reunions/<int:pk>/points/ajouter/", login_required(views.point_create), name="point_create"),
     path("points/<int:pk>/modifier/", login_required(views.point_update), name="point_update"),
     path("points/<int:pk>/supprimer/", login_required(views.point_delete), name="point_delete"),
+    path("parametres/", views.parametres, name="parametres"),
+    path("parametres/supprimer-logo/", views.supprimer_logo, name="supprimer_logo"),
 ]
 
 admin.site.site_header = "Administration DECC/VAE"

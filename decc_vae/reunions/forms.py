@@ -1,7 +1,10 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
 
-from .models import Point, Reunion
+from .models import Parametre, Point, Reunion
+
+LOGO_EXTENSIONS = {".png", ".jpg", ".jpeg", ".svg"}
 
 
 class ReunionForm(forms.ModelForm):
@@ -162,3 +165,39 @@ class MergeDbForm(forms.Form):
         label="Base SQLite à fusionner (.sqlite3 / .db)",
         widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": ".sqlite3,.db,.sqlite"}),
     )
+
+
+class ParametreForm(forms.ModelForm):
+    class Meta:
+        model = Parametre
+        fields = ["logo", "logo_actif", "nom_application"]
+        widgets = {
+            "logo": forms.FileInput(
+                attrs={"class": "form-control", "accept": "image/png,image/jpeg,image/svg+xml"}
+            ),
+            "logo_actif": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "nom_application": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+    def clean_logo(self):
+        logo = self.cleaned_data.get("logo")
+        if not logo:
+            return logo
+        name = getattr(logo, "name", "") or ""
+        ext = name[name.rfind(".") :].lower() if "." in name else ""
+        if ext not in LOGO_EXTENSIONS:
+            raise ValidationError("Formats acceptés : PNG, JPG, SVG.")
+        if ext != ".svg":
+            try:
+                from PIL import Image
+
+                logo.seek(0)
+                image = Image.open(logo)
+                if image.width > 200 or image.height > 200:
+                    raise ValidationError("Le logo ne doit pas dépasser 200 × 200 pixels.")
+                logo.seek(0)
+            except ValidationError:
+                raise
+            except Exception:
+                raise ValidationError("Fichier image invalide.")
+        return logo

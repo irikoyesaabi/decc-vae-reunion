@@ -3,13 +3,16 @@
 {% block page_title %}Réunion du {{ reunion.date|date:"d/m/Y" }}{% endblock %}
 {% block content %}
 <div class="toolbar">
-    <a class="btn btn-success" href="{% url 'reunion_update' reunion.pk %}">Modifier</a>
+    <a class="btn btn-danger" href="{% url 'export_pdf' reunion.pk %}">PDF</a>
+    <a class="btn btn-primary" href="{% url 'export_word' reunion.pk %}">Word</a>
+    <a class="btn btn-success" href="{% url 'export_excel' reunion.pk %}">Excel</a>
+    <a class="btn btn-warning" href="{% url 'export_excel_all' %}">Excel (Toutes)</a>
+    <a class="btn btn-info text-white" href="{% url 'import_excel' reunion.pk %}">Import Excel</a>
+</div>
+<div class="toolbar">
+    <a class="btn btn-warning" href="{% url 'reunion_update' reunion.pk %}">Modifier</a>
+    <a class="btn btn-danger" href="{% url 'reunion_delete' reunion.pk %}">Supprimer</a>
     <a class="btn btn-secondary" href="{% url 'reunion_list' %}">Retour</a>
-    <a class="btn btn-outline-danger" href="{% url 'reunion_delete' reunion.pk %}">Supprimer</a>
-    <a class="btn btn-outline-decc" href="{% url 'export_pdf' reunion.pk %}">PDF</a>
-    <a class="btn btn-outline-decc" href="{% url 'export_word' reunion.pk %}">Word</a>
-    <a class="btn btn-outline-decc" href="{% url 'export_excel' reunion.pk %}">Excel</a>
-    <a class="btn btn-outline-decc" href="{% url 'import_excel' reunion.pk %}">Importer Excel</a>
 </div>
 <div class="panel">
     <h2>Informations générales</h2>

@@ -1,19 +1,25 @@
-{% load static %}
+{% load static reunion_filters reunions_extras %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}DECC/VAE — Réunions{% endblock %}</title>
+    <title>{% block title %}{% get_app_name %} — Réunions{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+{% get_logo as logo_url %}
+{% get_app_name as app_name %}
 <div class="app-shell">
     <aside class="sidebar">
         <div class="brand">
-            <div class="brand-mark">DECC</div>
+            {% if logo_url %}
+                <img class="brand-logo" src="{{ logo_url }}" alt="{{ app_name }}">
+            {% else %}
+                <div class="brand-mark">DECC</div>
+            {% endif %}
             <div>
-                <strong>DECC / VAE</strong>
+                <strong class="logo-text">{{ app_name }}</strong>
                 <small>Gestion des réunions</small>
             </div>
         </div>
@@ -23,16 +29,24 @@
             <a href="{% url 'reunion_create' %}" class="{% if request.resolver_match.url_name == 'reunion_create' %}active{% endif %}">Nouvelle réunion</a>
             <a href="{% url 'rapport_complet' %}">Rapport</a>
             <a href="{% url 'merge_db' %}">Fusion SQLite</a>
+            {% if user.is_staff %}
+                <a href="{% url 'parametres' %}" class="{% if request.resolver_match.url_name == 'parametres' %}active{% endif %}">Paramètres</a>
+            {% endif %}
             <a href="{% url 'logout' %}">Déconnexion</a>
         </nav>
         <div class="sidebar-foot">
             <span>{{ request.user.username }}</span>
-            <small>MEN — Niger</small>
+            <small>MEFTP — Niger</small>
         </div>
     </aside>
     <main class="main">
         <header class="topbar">
             <button class="btn-menu" type="button" id="btnMenu" aria-label="Menu">☰</button>
+            {% if logo_url %}
+                <img class="header-logo" src="{{ logo_url }}" alt="{{ app_name }}">
+            {% else %}
+                <span class="header-logo-text">{{ app_name }}</span>
+            {% endif %}
             <h1>{% block page_title %}Tableau de bord{% endblock %}</h1>
         </header>
         {% if messages %}

@@ -2,29 +2,117 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Connexion — DECC/VAE</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - DECC/VAE</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body.login-page {
+            background: linear-gradient(135deg, #1a2a6c 0%, #2c3e7a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 480px;
+        }
+        .login-card .logo { text-align: center; margin-bottom: 24px; }
+        .login-card .logo h2 {
+            color: #1a2a6c;
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0 0 8px;
+        }
+        .login-card .logo .badge-decc {
+            background: #1a2a6c;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .login-card .logo .ministry {
+            font-size: 0.78rem;
+            color: #6c757d;
+            margin: 4px 0;
+            line-height: 1.45;
+        }
+        .login-card .logo .ministry strong { color: #1a2a6c; }
+        .login-card .logo hr { margin: 12px 0; border: 0; border-top: 1px solid #e9ecef; }
+        .login-card .form-control {
+            border-radius: 10px;
+            padding: 12px 15px;
+        }
+        .login-card .btn-primary {
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 700;
+            background: #1a2a6c;
+            border: none;
+            font-size: 1.1rem;
+            color: #fff;
+            width: 100%;
+            cursor: pointer;
+        }
+        .login-card .btn-primary:hover { background: #2c3e7a; }
+        .login-card .footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .login-card .footer .mefp { color: #1a2a6c; font-weight: 600; }
+        @media (max-width: 480px) {
+            .login-card { padding: 25px; }
+            .login-card .logo h2 { font-size: 1.5rem; }
+            .login-card .logo .ministry { font-size: 0.68rem; }
+        }
+    </style>
 </head>
-<body class="login-body">
-<div class="login-card">
-    <div class="login-header">
-        <div class="brand-mark">DECC</div>
-        <h1>DECC / VAE</h1>
-        <p>Direction des Examens, Concours, Certifications et VAE<br>Ministère de l'Éducation Nationale — Niger</p>
+<body class="login-page">
+    <div class="login-card">
+        <div class="logo">
+            <h2>DECC/VAE</h2>
+            <span class="badge-decc">DECC</span>
+            <hr>
+            <p class="ministry"><strong>Ministère de l'Enseignement et de la Formation Techniques et Professionnels</strong></p>
+            <p class="ministry">Secrétariat Général</p>
+            <p class="ministry">Direction Générale de la Qualité, des Normes et des Evaluations (DGQN/E)</p>
+            <p class="ministry"><strong>Direction des Examens, des Concours, des Certifications<br>et de la Validation des Acquis de l'Expérience (DECC/VAE)</strong></p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            <label class="form-label" for="username">Nom d'utilisateur</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="admin" required autofocus>
+            <label class="form-label mt-3" for="password">Mot de passe</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+            <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Se connecter</button>
+        </form>
+
+        <div class="footer">
+            <span class="mefp">MEFTP - Niger</span>
+        </div>
     </div>
-    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-    <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.GET.next }}">
-        <label class="form-label" for="username">Identifiant</label>
-        <input class="form-control" id="username" name="username" required autofocus>
-        <label class="form-label mt-3" for="password">Mot de passe</label>
-        <input class="form-control" id="password" name="password" type="password" required>
-        <button class="btn btn-success w-100 mt-4" type="submit">Se connecter</button>
-    </form>
-    <p class="login-hint">Compte par défaut : admin / admin123</p>
-</div>
 </body>
 </html>
