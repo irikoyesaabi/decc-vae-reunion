@@ -1,0 +1,26 @@
+<!-- Gabarit de référence pour l'export PDF (génération réelle via ReportLab dans export_pdf.py). -->
+<html>
+<head><meta charset="utf-8"><title>Compte rendu PDF</title></head>
+<body>
+  <header>
+    <h1>République du Niger — MEFPT — DECC/VAE</h1>
+    <h2>Compte rendu de réunion du {{ reunion.date }}</h2>
+  </header>
+  <section>
+    <p>Président : {{ reunion.president }} — Rapporteur : {{ reunion.rapporteur }}</p>
+    <p>Présents : {{ reunion.participants_presents }}</p>
+  </section>
+  <table>
+    <thead><tr><th>N°</th><th>Sujet</th><th>Urgence</th><th>Statut</th></tr></thead>
+    <tbody>
+      {% for p in reunion.points.all %}
+      <tr class="{% if p.urgence == 5 %}critique{% endif %}">
+        <td>{{ p.numero }}</td><td>{{ p.sujet }}</td><td>{{ p.urgence }}</td><td>{{ p.get_statut_display }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <section><h3>Synthèse</h3><p>{{ reunion.observations }}</p></section>
+  <footer>Signatures Président / Rapporteur — date de génération</footer>
+</body>
+</html>

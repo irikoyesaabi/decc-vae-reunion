@@ -1,0 +1,45 @@
+{% extends "reunions/base.html" %}
+{% block title %}Tableau de bord — DECC/VAE{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <article class="stat-card"><span>Réunions</span><strong>{{ stats.nb_reunions }}</strong></article>
+    <article class="stat-card danger"><span>Points critiques</span><strong>{{ stats.nb_critiques }}</strong></article>
+    <article class="stat-card warn"><span>Points urgents</span><strong>{{ stats.nb_urgents }}</strong></article>
+    <article class="stat-card ok"><span>Terminés</span><strong>{{ stats.nb_faits }}</strong></article>
+    <article class="stat-card"><span>En cours</span><strong>{{ stats.nb_en_cours }}</strong></article>
+    <article class="stat-card"><span>À faire</span><strong>{{ stats.nb_a_faire }}</strong></article>
+</div>
+<div class="panel mt-3"><h2>Répartition par volet</h2><canvas id="chartVolets" height="180"></canvas></div>
+<div class="row g-3 mt-1">
+    <div class="col-lg-6">
+        <div class="panel">
+            <h2>10 dernières réunions</h2>
+            <ul class="list-plain">
+                {% for r in dernieres %}
+                    <li><a href="{% url 'reunion_detail' r.pk %}">{{ r.date|date:"d/m/Y" }} — {{ r.get_type_label }}</a><small>{{ r.president }}</small></li>
+                {% empty %}<li>Aucune réunion enregistrée.</li>{% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel">
+            <h2>Points critiques (urgence 5)</h2>
+            <ul class="list-plain">
+                {% for p in points_critiques %}
+                    <li>
+                        <a href="{% url 'reunion_detail' p.reunion_id %}">{{ p.sujet|truncatechars:80 }}</a>
+                        <small>{{ p.reunion.date|date:"d/m/Y" }} · {{ p.get_volet_label }} · {{ p.get_statut_display }}</small>
+                    </li>
+                {% empty %}<li>Aucun point critique.</li>{% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const volets = {{ chart_volets|safe }};
+drawPie("chartVolets", volets.labels, volets.data);
+</script>
+{% endblock %}

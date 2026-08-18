@@ -1,0 +1,47 @@
+{% extends "reunions/base.html" %}
+{% block title %}Mes réunions — DECC/VAE{% endblock %}
+{% block page_title %}Mes réunions{% endblock %}
+{% block content %}
+<form method="get" class="panel filter-panel">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">{{ form.q.label_tag }}{{ form.q }}</div>
+        <div class="col-md-2">{{ form.date_debut.label_tag }}{{ form.date_debut }}</div>
+        <div class="col-md-2">{{ form.date_fin.label_tag }}{{ form.date_fin }}</div>
+        <div class="col-md-2">{{ form.volet.label_tag }}{{ form.volet }}</div>
+        <div class="col-md-1">{{ form.urgence.label_tag }}{{ form.urgence }}</div>
+        <div class="col-md-2">{{ form.statut.label_tag }}{{ form.statut }}</div>
+        <div class="col-md-3">{{ form.type.label_tag }}{{ form.type }}</div>
+        <div class="col-md-9 d-flex gap-2 flex-wrap">
+            <button class="btn btn-success" type="submit">Filtrer</button>
+            <a class="btn btn-secondary" href="{% url 'reunion_list' %}">Réinitialiser</a>
+            <a class="btn btn-outline-decc" href="{% url 'export_excel_all' %}?{{ request.GET.urlencode }}">Export Excel (toutes)</a>
+            <a class="btn btn-success" href="{% url 'reunion_create' %}">Nouvelle réunion</a>
+        </div>
+    </div>
+</form>
+<div class="panel table-wrap">
+<table class="table">
+    <thead><tr><th>Date</th><th>Type</th><th>Lieu</th><th>Président</th><th>Participants</th><th>Points</th><th></th></tr></thead>
+    <tbody>
+    {% for r in reunions %}
+        <tr>
+            <td>{{ r.date|date:"d/m/Y" }}</td>
+            <td>{{ r.get_type_label }}</td>
+            <td>{{ r.get_lieu_label }}</td>
+            <td>{{ r.president }}</td>
+            <td>{{ r.nombre_participants }}</td>
+            <td>{{ r.points.count }}</td>
+            <td class="text-nowrap">
+                <a class="btn btn-sm btn-success" href="{% url 'reunion_detail' r.pk %}">Détail</a>
+                <a class="btn btn-sm btn-outline-decc" href="{% url 'export_pdf' r.pk %}">PDF</a>
+                <a class="btn btn-sm btn-outline-decc" href="{% url 'export_word' r.pk %}">Word</a>
+                <a class="btn btn-sm btn-outline-decc" href="{% url 'export_excel' r.pk %}">Excel</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="7">Aucune réunion ne correspond aux critères.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
