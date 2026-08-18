@@ -7,8 +7,8 @@
     <p class="text-danger">Tous les points associés seront également supprimés.</p>
     <form method="post">
         {% csrf_token %}
-        <button class="btn btn-success" type="submit">Enregistrer la suppression</button>
-        <a class="btn btn-secondary" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
+        <button class="btn btn-danger btn-lg" type="submit">Supprimer</button>
+        <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
     </form>
 </div>
 {% endblock %}

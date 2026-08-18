@@ -2,6 +2,12 @@
 {% block title %}Tableau de bord — DECC/VAE{% endblock %}
 {% block page_title %}Tableau de bord{% endblock %}
 {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <p class="text-muted mb-0">Bienvenue sur la plateforme de gestion des réunions DECC/VAE</p>
+    </div>
+    <a href="{% url 'reunion_create' %}" class="btn btn-primary btn-lg">Nouvelle réunion</a>
+</div>
 <div class="stats-grid">
     <article class="stat-card"><span>Réunions</span><strong>{{ stats.nb_reunions }}</strong></article>
     <article class="stat-card danger"><span>Points critiques</span><strong>{{ stats.nb_critiques }}</strong></article>

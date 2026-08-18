@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Count, Q
 from django.http import HttpResponse
@@ -24,6 +25,7 @@ from .export_utils import (
 from .forms import (
     ImportExcelForm,
     MergeDbForm,
+    ParametreForm,
     PointForm,
     PointFormSet,
     RapportForm,
@@ -31,7 +33,7 @@ from .forms import (
     ReunionForm,
 )
 from .merge_db import merge_sqlite_file
-from .models import Point, Reunion
+from .models import Parametre, Point, Reunion
 
 
 def login_view(request):
@@ -358,3 +360,33 @@ def merge_databases(request):
     else:
         form = MergeDbForm()
     return render(request, "reunions/merge_db.html", {"form": form})
+
+
+@staff_member_required
+def parametres(request):
+    instance = Parametre.get_instance()
+    if request.method == "POST":
+        form = ParametreForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Paramètres mis à jour.")
+            return redirect("parametres")
+        messages.error(request, "Corrigez les erreurs du formulaire.")
+    else:
+        form = ParametreForm(instance=instance)
+    return render(
+        request,
+        "reunions/parametres.html",
+        {"form": form, "instance": instance, "titre": "Paramètres de l'application"},
+    )
+
+
+@staff_member_required
+def supprimer_logo(request):
+    instance = Parametre.get_instance()
+    if instance.logo:
+        instance.logo.delete(save=False)
+        instance.logo = None
+        instance.save()
+        messages.success(request, "Logo personnalisé supprimé. Le logo par défaut est rétabli.")
+    return redirect("parametres")
