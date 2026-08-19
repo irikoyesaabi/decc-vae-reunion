@@ -1,0 +1,25 @@
+/* Icônes locales (hors ligne) — sous-ensemble Bootstrap Icons */
+.bi {
+  display: inline-block;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+  margin-right: .35rem;
+  vertical-align: -0.05em;
+}
+.bi-save::before { content: "💾"; }
+.bi-arrow-left::before { content: "←"; }
+.bi-trash::before { content: "🗑"; }
+.bi-pencil::before { content: "✎"; }
+.bi-file-pdf::before { content: "📄"; }
+.bi-file-word::before { content: "📄"; }
+.bi-file-excel::before { content: "📊"; }
+.bi-file-spreadsheet::before { content: "📑"; }
+.bi-upload::before { content: "⬆"; }
+.bi-download::before { content: "⬇"; }
+.bi-plus-circle::before { content: "＋"; }
+.bi-filter::before { content: "☰"; }
+.bi-arrow-counterclockwise::before { content: "↺"; }
+.bi-box-arrow-in-right::before { content: "→"; }
+.bi-eye::before { content: "👁"; }
+.bi-database-fill-up::before { content: "🗄"; }

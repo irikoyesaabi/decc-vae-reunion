@@ -5,13 +5,17 @@
 <div class="panel">
     <p>Réunion du {{ reunion.date|date:"d/m/Y" }}. Colonnes attendues :</p>
     <p><code>Rubrique | Volet | Sujet | Décision | Action | Responsable | Délai | Urgence | Statut</code></p>
-    <p><a href="{% url 'excel_template' %}">Télécharger le modèle Excel</a></p>
+    <p>
+        <a href="{% url 'excel_template' %}" class="btn btn-outline-primary">
+            <i class="bi bi-download"></i> Télécharger le modèle
+        </a>
+    </p>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.fichier.label_tag }}{{ form.fichier }}
         <div class="mt-4 d-flex gap-2 flex-wrap">
-            <button class="btn btn-success btn-lg" type="submit">Enregistrer</button>
-            <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
+            <button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-upload"></i> Importer</button>
+            <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' reunion.pk %}"><i class="bi bi-arrow-left"></i> Annuler</a>
         </div>
     </form>
 </div>

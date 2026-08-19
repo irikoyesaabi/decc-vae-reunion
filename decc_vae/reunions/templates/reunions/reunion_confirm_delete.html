@@ -7,8 +7,10 @@
     <p class="text-danger">Tous les points associés seront également supprimés.</p>
     <form method="post">
         {% csrf_token %}
-        <button class="btn btn-danger btn-lg" type="submit">Supprimer</button>
-        <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
+        <div class="mt-4 d-flex gap-2 flex-wrap">
+            <button class="btn btn-danger btn-lg" type="submit"><i class="bi bi-trash"></i> Supprimer</button>
+            <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' reunion.pk %}"><i class="bi bi-arrow-left"></i> Annuler</a>
+        </div>
     </form>
 </div>
 {% endblock %}

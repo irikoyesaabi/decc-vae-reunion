@@ -33,14 +33,14 @@
         </div>
 
         <div class="mt-4 d-flex gap-2 flex-wrap">
-            <button type="submit" class="btn btn-success btn-lg">Enregistrer</button>
+            <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-save"></i> Enregistrer</button>
             {% if instance.logo %}
                 <a href="{% url 'supprimer_logo' %}" class="btn btn-danger btn-lg"
                    onclick="return confirm('Supprimer le logo personnalisé et revenir au logo par défaut ?')">
-                    Supprimer le logo
+                    <i class="bi bi-trash"></i> Supprimer le logo
                 </a>
             {% endif %}
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg">Annuler</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg"><i class="bi bi-arrow-left"></i> Annuler</a>
         </div>
     </form>
 </div>

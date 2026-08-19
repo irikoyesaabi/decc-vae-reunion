@@ -17,8 +17,8 @@
         <div class="col-md-6">{{ form.delai.label_tag }}{{ form.delai }}</div>
     </div>
     <div class="mt-4 d-flex gap-2 flex-wrap">
-        <button class="btn btn-success btn-lg" type="submit">Enregistrer</button>
-        <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' reunion.pk %}">Annuler</a>
+        <button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-save"></i> Enregistrer</button>
+        <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' reunion.pk %}"><i class="bi bi-arrow-left"></i> Annuler</a>
     </div>
 </form>
 {% endblock %}

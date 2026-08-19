@@ -47,8 +47,12 @@
         </fieldset>
     {% endfor %}
     <div class="mt-4 d-flex gap-2 flex-wrap">
-        <button type="submit" class="btn btn-primary btn-lg">Enregistrer</button>
-        <a href="{% if reunion %}{% url 'reunion_detail' reunion.pk %}{% else %}{% url 'reunion_list' %}{% endif %}" class="btn btn-secondary btn-lg">Annuler</a>
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-save"></i> Enregistrer
+        </button>
+        <a href="{% if reunion %}{% url 'reunion_detail' reunion.pk %}{% else %}{% url 'reunion_list' %}{% endif %}" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> Annuler
+        </a>
     </div>
 </form>
 {% endblock %}

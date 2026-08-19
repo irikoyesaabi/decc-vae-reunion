@@ -2,17 +2,17 @@
 {% block title %}Réunion du {{ reunion.date|date:"d/m/Y" }}{% endblock %}
 {% block page_title %}Réunion du {{ reunion.date|date:"d/m/Y" }}{% endblock %}
 {% block content %}
-<div class="toolbar">
-    <a class="btn btn-danger" href="{% url 'export_pdf' reunion.pk %}">PDF</a>
-    <a class="btn btn-primary" href="{% url 'export_word' reunion.pk %}">Word</a>
-    <a class="btn btn-success" href="{% url 'export_excel' reunion.pk %}">Excel</a>
-    <a class="btn btn-warning" href="{% url 'export_excel_all' %}">Excel (Toutes)</a>
-    <a class="btn btn-info text-white" href="{% url 'import_excel' reunion.pk %}">Import Excel</a>
+<div class="mt-4 d-flex gap-2 flex-wrap mb-3">
+    <a href="{% url 'export_pdf' reunion.pk %}" class="btn btn-danger btn-lg"><i class="bi bi-file-pdf"></i> PDF</a>
+    <a href="{% url 'export_word' reunion.pk %}" class="btn btn-primary btn-lg"><i class="bi bi-file-word"></i> Word</a>
+    <a href="{% url 'export_excel' reunion.pk %}" class="btn btn-success btn-lg"><i class="bi bi-file-excel"></i> Excel</a>
+    <a href="{% url 'export_excel_all' %}" class="btn btn-warning btn-lg"><i class="bi bi-file-spreadsheet"></i> Excel (Toutes)</a>
+    <a href="{% url 'import_excel' reunion.pk %}" class="btn btn-info text-white btn-lg"><i class="bi bi-upload"></i> Import Excel</a>
 </div>
-<div class="toolbar">
-    <a class="btn btn-warning" href="{% url 'reunion_update' reunion.pk %}">Modifier</a>
-    <a class="btn btn-danger" href="{% url 'reunion_delete' reunion.pk %}">Supprimer</a>
-    <a class="btn btn-secondary" href="{% url 'reunion_list' %}">Retour</a>
+<div class="mt-4 d-flex gap-2 flex-wrap mb-3">
+    <a href="{% url 'reunion_update' reunion.pk %}" class="btn btn-warning btn-lg"><i class="bi bi-pencil"></i> Modifier</a>
+    <a href="{% url 'reunion_delete' reunion.pk %}" class="btn btn-danger btn-lg"><i class="bi bi-trash"></i> Supprimer</a>
+    <a href="{% url 'reunion_list' %}" class="btn btn-secondary btn-lg"><i class="bi bi-arrow-left"></i> Retour</a>
 </div>
 <div class="panel">
     <h2>Informations générales</h2>
@@ -34,7 +34,7 @@
 <div class="panel">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h2 class="mb-0">Points</h2>
-        <a class="btn btn-sm btn-success" href="{% url 'point_create' reunion.pk %}">Ajouter un point</a>
+        <a class="btn btn-primary btn-lg" href="{% url 'point_create' reunion.pk %}"><i class="bi bi-plus-circle"></i> Ajouter un point</a>
     </div>
     <div class="table-wrap">
     <table class="table table-sm">

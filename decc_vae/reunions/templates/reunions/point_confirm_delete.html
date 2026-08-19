@@ -6,8 +6,10 @@
     <p>Supprimer le point n° {{ point.numero }} : <strong>{{ point.sujet }}</strong> ?</p>
     <form method="post">
         {% csrf_token %}
-        <button class="btn btn-success" type="submit">Enregistrer la suppression</button>
-        <a class="btn btn-secondary" href="{% url 'reunion_detail' point.reunion_id %}">Annuler</a>
+        <div class="mt-4 d-flex gap-2 flex-wrap">
+            <button class="btn btn-danger btn-lg" type="submit"><i class="bi bi-trash"></i> Supprimer</button>
+            <a class="btn btn-secondary btn-lg" href="{% url 'reunion_detail' point.reunion_id %}"><i class="bi bi-arrow-left"></i> Annuler</a>
+        </div>
     </form>
 </div>
 {% endblock %}
