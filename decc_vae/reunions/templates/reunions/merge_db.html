@@ -7,9 +7,9 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.fichier.label_tag }}{{ form.fichier }}
-        <div class="mt-3 d-flex gap-2">
-            <button class="btn btn-success" type="submit">Enregistrer la fusion</button>
-            <a class="btn btn-secondary" href="{% url 'dashboard' %}">Annuler</a>
+        <div class="mt-4 d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary btn-lg" type="submit">Lancer la fusion</button>
+            <a class="btn btn-secondary btn-lg" href="{% url 'dashboard' %}">Annuler</a>
         </div>
     </form>
 </div>

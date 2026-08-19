@@ -24,15 +24,17 @@
             </div>
         </div>
         <nav>
-            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Tableau de bord</a>
-            <a href="{% url 'reunion_list' %}" class="{% if request.resolver_match.url_name == 'reunion_list' %}active{% endif %}">Mes réunions</a>
-            <a href="{% url 'reunion_create' %}" class="{% if request.resolver_match.url_name == 'reunion_create' %}active{% endif %}">Nouvelle réunion</a>
-            <a href="{% url 'rapport_complet' %}">Rapport</a>
-            <a href="{% url 'merge_db' %}">Fusion SQLite</a>
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">📊 Tableau de bord</a>
+            <a href="{% url 'reunion_list' %}" class="{% if request.resolver_match.url_name == 'reunion_list' %}active{% endif %}">📅 Mes réunions</a>
+            <a href="{% url 'reunion_create' %}" class="{% if request.resolver_match.url_name == 'reunion_create' %}active{% endif %}">➕ Nouvelle réunion</a>
+            <hr class="sidebar-sep">
+            <a href="{% url 'merge_db' %}" class="{% if request.resolver_match.url_name == 'merge_db' %}active{% endif %}">🔗 Fusion SQLite</a>
+            <a href="{% url 'rapport_complet' %}" class="{% if request.resolver_match.url_name == 'rapport_complet' %}active{% endif %}">📄 Rapport</a>
             {% if user.is_staff %}
-                <a href="{% url 'parametres' %}" class="{% if request.resolver_match.url_name == 'parametres' %}active{% endif %}">Paramètres</a>
+                <a href="{% url 'parametres' %}" class="{% if request.resolver_match.url_name == 'parametres' %}active{% endif %}">⚙️ Paramètres</a>
             {% endif %}
-            <a href="{% url 'logout' %}">Déconnexion</a>
+            <hr class="sidebar-sep">
+            <a href="{% url 'logout' %}" class="sidebar-logout">🚪 Déconnexion</a>
         </nav>
         <div class="sidebar-foot">
             <span>{{ request.user.username }}</span>

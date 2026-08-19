@@ -26,8 +26,10 @@ a { color: var(--accent); text-decoration: none; }
   display: grid; place-items: center; font-weight: 800; font-size: .75rem;
 }
 .sidebar nav { display: flex; flex-direction: column; padding: .8rem; gap: .25rem; flex: 1; }
-.sidebar nav a { color: #d7e4f2; padding: .7rem .9rem; border-radius: 8px; }
+.sidebar nav a { color: #d7e4f2; padding: .7rem .9rem; border-radius: 8px; display: block; }
 .sidebar nav a:hover, .sidebar nav a.active { background: rgba(255,255,255,.12); color: #fff; }
+.sidebar-sep { border: 0; border-top: 1px solid rgba(255,255,255,.18); margin: .4rem .9rem; }
+.sidebar-logout { opacity: .8; }
 .sidebar-foot { padding: 1rem 1.2rem; font-size: .85rem; opacity: .85; border-top: 1px solid rgba(255,255,255,.12); }
 .sidebar-foot small { display: block; opacity: .7; }
 .main { flex: 1; padding: 1.2rem 1.5rem 2rem; min-width: 0; }
