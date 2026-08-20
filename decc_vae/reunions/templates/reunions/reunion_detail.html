@@ -11,6 +11,7 @@
 </div>
 <div class="mt-4 d-flex gap-2 flex-wrap mb-3">
     <a href="{% url 'reunion_update' reunion.pk %}" class="btn btn-warning btn-lg"><i class="bi bi-pencil"></i> Modifier</a>
+    <a href="{% url 'documents_reunion' reunion.pk %}" class="btn btn-info text-white btn-lg"><i class="bi bi-folder2-open"></i> Documents{% if reunion.documents.all %} ({{ reunion.documents.count }}){% endif %}</a>
     <a href="{% url 'reunion_delete' reunion.pk %}" class="btn btn-danger btn-lg"><i class="bi bi-trash"></i> Supprimer</a>
     <a href="{% url 'reunion_list' %}" class="btn btn-secondary btn-lg"><i class="bi bi-arrow-left"></i> Retour</a>
 </div>

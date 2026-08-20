@@ -2,9 +2,11 @@
 {% block title %}{{ titre }}{% endblock %}
 {% block page_title %}{{ titre }}{% endblock %}
 {% block content %}
-<form method="post" class="panel">
+<form method="post" enctype="multipart/form-data" class="panel" id="reunion-form">
     {% csrf_token %}
     {{ formset.management_form }}
+    {{ document_formset.management_form }}
+
     <h2>Informations générales</h2>
     <div class="row g-3">
         <div class="col-md-3">{{ form.date.label_tag }}{{ form.date }} {{ form.date.errors }}</div>
@@ -24,9 +26,11 @@
         <div class="col-md-9">{{ form.objet_prochaine.label_tag }}{{ form.objet_prochaine }}</div>
         <div class="col-12">{{ form.observations.label_tag }}{{ form.observations }}</div>
     </div>
+
     <h2 class="mt-4">Points de réunion</h2>
-    {% for f in formset %}
-        <fieldset class="point-block">
+    <div id="points-container">
+        {% for f in formset %}
+        <fieldset class="point-block" data-form-prefix="{{ f.prefix }}">
             {% if f.id %}{{ f.id }}{% endif %}
             <legend>Point {% if f.instance.pk %}n° {{ f.instance.numero }}{% else %}nouveau{% endif %}</legend>
             <div class="row g-2">
@@ -37,15 +41,62 @@
                 <div class="col-md-2">{{ f.statut.label_tag }}{{ f.statut }}</div>
                 <div class="col-md-3">{{ f.delai.label_tag }}{{ f.delai }}</div>
                 <div class="col-md-3">{{ f.responsable.label_tag }}{{ f.responsable }}</div>
-                <div class="col-12">{{ f.sujet.label_tag }}{{ f.sujet }}</div>
+                <div class="col-12">{{ f.sujet.label_tag }}{{ f.sujet }}{{ f.sujet.errors }}</div>
                 <div class="col-md-6">{{ f.decision.label_tag }}{{ f.decision }}</div>
                 <div class="col-md-6">{{ f.action.label_tag }}{{ f.action }}</div>
                 {% if formset.can_delete %}
                 <div class="col-12"><label>{{ f.DELETE }} Supprimer ce point</label></div>
                 {% endif %}
             </div>
+            {{ f.non_field_errors }}
         </fieldset>
-    {% endfor %}
+        {% endfor %}
+    </div>
+    <button type="button" class="btn btn-outline-primary mt-2" id="btn-add-point">
+        <i class="bi bi-plus-circle"></i> Ajouter un point
+    </button>
+
+    <h2 class="mt-4"><i class="bi bi-file-earmark-text"></i> Documents associés</h2>
+    <div class="table-wrap">
+        <table class="table table-bordered" id="documents-table">
+            <thead>
+                <tr>
+                    <th>Nom du document</th>
+                    <th>Fichier</th>
+                    <th>Description</th>
+                    <th>Supprimer</th>
+                </tr>
+            </thead>
+            <tbody id="documents-tbody">
+                {% for doc_form in document_formset %}
+                <tr class="document-row" data-form-prefix="{{ doc_form.prefix }}">
+                    <td>
+                        {% if doc_form.id %}{{ doc_form.id }}{% endif %}
+                        {{ doc_form.nom }}{{ doc_form.nom.errors }}
+                    </td>
+                    <td>
+                        {{ doc_form.fichier }}{{ doc_form.fichier.errors }}
+                        {% if doc_form.instance.pk and doc_form.instance.fichier %}
+                        <div class="small mt-1">
+                            <a href="{{ doc_form.instance.fichier.url }}" target="_blank">Fichier actuel</a>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>{{ doc_form.description }}</td>
+                    <td class="text-center">
+                        {% if document_formset.can_delete %}
+                        <label>{{ doc_form.DELETE }}</label>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <button type="button" class="btn btn-outline-primary" id="btn-add-document">
+        <i class="bi bi-plus-circle"></i> Ajouter un document
+    </button>
+
     <div class="mt-4 d-flex gap-2 flex-wrap">
         <button type="submit" class="btn btn-primary btn-lg">
             <i class="bi bi-save"></i> Enregistrer
@@ -55,4 +106,106 @@
         </a>
     </div>
 </form>
+
+<template id="empty-point-template">
+    <fieldset class="point-block" data-form-prefix="__prefix__">
+        {{ formset.empty_form.id }}
+        <legend>Point nouveau</legend>
+        <div class="row g-2">
+            <div class="col-md-2">{{ formset.empty_form.rubrique.label_tag }}{{ formset.empty_form.rubrique }}</div>
+            <div class="col-md-2">{{ formset.empty_form.volet.label_tag }}{{ formset.empty_form.volet }}</div>
+            <div class="col-md-3 js-volet-wrap">{{ formset.empty_form.volet_autre_precision.label_tag }}{{ formset.empty_form.volet_autre_precision }}</div>
+            <div class="col-md-2">{{ formset.empty_form.urgence.label_tag }}{{ formset.empty_form.urgence }}</div>
+            <div class="col-md-2">{{ formset.empty_form.statut.label_tag }}{{ formset.empty_form.statut }}</div>
+            <div class="col-md-3">{{ formset.empty_form.delai.label_tag }}{{ formset.empty_form.delai }}</div>
+            <div class="col-md-3">{{ formset.empty_form.responsable.label_tag }}{{ formset.empty_form.responsable }}</div>
+            <div class="col-12">{{ formset.empty_form.sujet.label_tag }}{{ formset.empty_form.sujet }}</div>
+            <div class="col-md-6">{{ formset.empty_form.decision.label_tag }}{{ formset.empty_form.decision }}</div>
+            <div class="col-md-6">{{ formset.empty_form.action.label_tag }}{{ formset.empty_form.action }}</div>
+            {% if formset.can_delete %}
+            <div class="col-12"><label>{{ formset.empty_form.DELETE }} Supprimer ce point</label></div>
+            {% endif %}
+        </div>
+    </fieldset>
+</template>
+
+<template id="empty-document-template">
+    <tr class="document-row" data-form-prefix="__prefix__">
+        <td>
+            {{ document_formset.empty_form.id }}
+            {{ document_formset.empty_form.nom }}
+        </td>
+        <td>{{ document_formset.empty_form.fichier }}</td>
+        <td>{{ document_formset.empty_form.description }}</td>
+        <td class="text-center">
+            {% if document_formset.can_delete %}
+            <label>{{ document_formset.empty_form.DELETE }}</label>
+            {% endif %}
+        </td>
+    </tr>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  function bindVolet(root) {
+    (root || document).querySelectorAll(".js-volet").forEach(function (sel) {
+      if (sel.dataset.bound) return;
+      sel.dataset.bound = "1";
+      var wrap = sel.closest(".row, .point-block, form") &&
+        sel.closest(".row, .point-block, form").querySelector(".js-volet-wrap");
+      function sync() {
+        if (!wrap) return;
+        wrap.style.display = sel.value === "autre" ? "" : "none";
+      }
+      sel.addEventListener("change", sync);
+      sync();
+    });
+  }
+
+  function addFormsetRow(options) {
+    var totalInput = document.getElementById(options.totalId);
+    var maxInput = document.getElementById(options.maxId);
+    if (!totalInput) return;
+    var index = parseInt(totalInput.value, 10);
+    var maxNum = maxInput ? parseInt(maxInput.value, 10) : 50;
+    if (index >= maxNum) {
+      alert("Nombre maximum atteint (" + maxNum + ").");
+      return;
+    }
+    var tpl = document.getElementById(options.templateId);
+    var html = tpl.innerHTML.replace(/__prefix__/g, String(index));
+    var container = document.getElementById(options.containerId);
+    if (options.insertAs === "tr") {
+      container.insertAdjacentHTML("beforeend", html);
+    } else {
+      container.insertAdjacentHTML("beforeend", html);
+    }
+    totalInput.value = index + 1;
+    bindVolet(container);
+  }
+
+  document.getElementById("btn-add-point")?.addEventListener("click", function () {
+    addFormsetRow({
+      totalId: "id_points-TOTAL_FORMS",
+      maxId: "id_points-MAX_NUM_FORMS",
+      templateId: "empty-point-template",
+      containerId: "points-container",
+    });
+  });
+
+  document.getElementById("btn-add-document")?.addEventListener("click", function () {
+    addFormsetRow({
+      totalId: "id_documents-TOTAL_FORMS",
+      maxId: "id_documents-MAX_NUM_FORMS",
+      templateId: "empty-document-template",
+      containerId: "documents-tbody",
+      insertAs: "tr",
+    });
+  });
+
+  bindVolet(document);
+})();
+</script>
 {% endblock %}

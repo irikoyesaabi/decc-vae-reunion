@@ -23,6 +23,8 @@ from .export_utils import (
     import_points_from_xlsx,
 )
 from .forms import (
+    DocumentForm,
+    DocumentFormSet,
     ImportExcelForm,
     MergeDbForm,
     ParametreForm,
@@ -33,7 +35,7 @@ from .forms import (
     ReunionForm,
 )
 from .merge_db import merge_sqlite_file
-from .models import Parametre, Point, Reunion
+from .models import DocumentReunion, Parametre, Point, Reunion
 
 
 def login_view(request):
@@ -91,7 +93,10 @@ def dashboard(request):
 
 def _filtered_reunions(request):
     form = ReunionFilterForm(request.GET or None)
-    qs = Reunion.objects.all().prefetch_related("points")
+    qs = Reunion.objects.all().annotate(
+        nb_points=Count("points", distinct=True),
+        nb_documents=Count("documents", distinct=True),
+    )
     if form.is_valid():
         data = form.cleaned_data
         if data.get("date_debut"):
@@ -125,7 +130,10 @@ def reunion_list(request):
 
 
 def reunion_detail(request, pk):
-    reunion = get_object_or_404(Reunion.objects.prefetch_related("points"), pk=pk)
+    reunion = get_object_or_404(
+        Reunion.objects.prefetch_related("points", "documents"),
+        pk=pk,
+    )
     return render(request, "reunions/reunion_detail.html", {"reunion": reunion})
 
 
@@ -133,28 +141,39 @@ def reunion_create(request):
     reunion = Reunion()
     if request.method == "POST":
         form = ReunionForm(request.POST)
-        formset = PointFormSet(request.POST, instance=reunion)
         if form.is_valid():
             reunion = form.save(commit=False)
             reunion.cree_par = request.user
             reunion.save()
             formset = PointFormSet(request.POST, instance=reunion)
-            if formset.is_valid():
+            document_formset = DocumentFormSet(request.POST, request.FILES, instance=reunion)
+            if formset.is_valid() and document_formset.is_valid():
                 formset.save()
+                document_formset.save()
                 messages.success(request, "La réunion a été créée.")
                 return redirect("reunion_detail", pk=reunion.pk)
             reunion.delete()
-            messages.error(request, "Corrigez les erreurs des points de réunion.")
+            messages.error(request, "Corrigez les erreurs des points ou des documents.")
             reunion = Reunion()
             form = ReunionForm(request.POST)
             formset = PointFormSet(request.POST, instance=reunion)
+            document_formset = DocumentFormSet(request.POST, request.FILES, instance=reunion)
+        else:
+            formset = PointFormSet(request.POST, instance=reunion)
+            document_formset = DocumentFormSet(request.POST, request.FILES, instance=reunion)
     else:
         form = ReunionForm()
         formset = PointFormSet(instance=reunion)
+        document_formset = DocumentFormSet(instance=reunion)
     return render(
         request,
         "reunions/reunion_form.html",
-        {"form": form, "formset": formset, "titre": "Nouvelle réunion"},
+        {
+            "form": form,
+            "formset": formset,
+            "document_formset": document_formset,
+            "titre": "Nouvelle réunion",
+        },
     )
 
 
@@ -163,20 +182,62 @@ def reunion_update(request, pk):
     if request.method == "POST":
         form = ReunionForm(request.POST, instance=reunion)
         formset = PointFormSet(request.POST, instance=reunion)
-        if form.is_valid() and formset.is_valid():
+        document_formset = DocumentFormSet(request.POST, request.FILES, instance=reunion)
+        if form.is_valid() and formset.is_valid() and document_formset.is_valid():
             form.save()
             formset.save()
+            document_formset.save()
             messages.success(request, "La réunion a été mise à jour.")
             return redirect("reunion_detail", pk=reunion.pk)
         messages.error(request, "Corrigez les erreurs du formulaire.")
     else:
         form = ReunionForm(instance=reunion)
         formset = PointFormSet(instance=reunion)
+        document_formset = DocumentFormSet(instance=reunion)
     return render(
         request,
         "reunions/reunion_form.html",
-        {"form": form, "formset": formset, "titre": "Modifier la réunion", "reunion": reunion},
+        {
+            "form": form,
+            "formset": formset,
+            "document_formset": document_formset,
+            "titre": "Modifier la réunion",
+            "reunion": reunion,
+        },
     )
+
+
+def documents_reunion(request, pk):
+    reunion = get_object_or_404(Reunion, pk=pk)
+    documents = reunion.documents.all()
+    if request.method == "POST":
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid() and not form.is_empty():
+            doc = form.save(commit=False)
+            doc.reunion = reunion
+            doc.save()
+            messages.success(request, "Document ajouté avec succès.")
+            return redirect("documents_reunion", pk=reunion.pk)
+        if form.is_empty():
+            form.add_error("nom", "Indiquez un nom et un fichier.")
+        messages.error(request, "Corrigez les erreurs du formulaire.")
+    else:
+        form = DocumentForm()
+    return render(
+        request,
+        "reunions/documents_reunion.html",
+        {"reunion": reunion, "documents": documents, "form": form},
+    )
+
+
+def supprimer_document(request, pk):
+    doc = get_object_or_404(DocumentReunion.objects.select_related("reunion"), pk=pk)
+    reunion_id = doc.reunion_id
+    if doc.fichier:
+        doc.fichier.delete(save=False)
+    doc.delete()
+    messages.success(request, "Document supprimé avec succès.")
+    return redirect("documents_reunion", pk=reunion_id)
 
 
 def reunion_delete(request, pk):

@@ -1,8 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import inlineformset_factory
+from django.forms import BaseInlineFormSet, inlineformset_factory
 
-from .models import Parametre, Point, Reunion
+from .models import DocumentReunion, Parametre, Point, Reunion
 
 LOGO_EXTENSIONS = {".png", ".jpg", ".jpeg", ".svg"}
 
@@ -78,12 +78,143 @@ class PointForm(forms.ModelForm):
             "statut": forms.Select(attrs={"class": "form-select"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["sujet"].required = False
+        self.fields["volet"].required = False
+
+    def is_empty(self):
+        if not hasattr(self, "cleaned_data"):
+            return True
+        data = self.cleaned_data
+        return not any(
+            [
+                (data.get("sujet") or "").strip(),
+                (data.get("decision") or "").strip(),
+                (data.get("action") or "").strip(),
+                (data.get("responsable") or "").strip(),
+                data.get("delai"),
+            ]
+        )
+
+    def clean(self):
+        cleaned = super().clean()
+        sujet = (cleaned.get("sujet") or "").strip()
+        decision = (cleaned.get("decision") or "").strip()
+        action = (cleaned.get("action") or "").strip()
+        responsable = (cleaned.get("responsable") or "").strip()
+        if not any([sujet, decision, action, responsable, cleaned.get("delai")]):
+            return cleaned
+        if not sujet:
+            self.add_error("sujet", "Le sujet est obligatoire.")
+        if not cleaned.get("volet"):
+            self.add_error("volet", "Le volet est obligatoire.")
+        cleaned["sujet"] = sujet
+        return cleaned
+
+
+class BasePointFormSet(BaseInlineFormSet):
+    def save_new_objects(self, commit=True):
+        self.new_objects = []
+        for form in self.extra_forms:
+            if not hasattr(form, "cleaned_data") or form.is_empty():
+                continue
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            self.new_objects.append(self.save_new(form, commit=commit))
+            if not commit:
+                self.saved_forms.append(form)
+        return self.new_objects
+
 
 PointFormSet = inlineformset_factory(
     Reunion,
     Point,
     form=PointForm,
-    extra=2,
+    formset=BasePointFormSet,
+    extra=1,
+    max_num=50,
+    can_delete=True,
+    min_num=0,
+    validate_min=False,
+)
+
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = DocumentReunion
+        fields = ["nom", "fichier", "description"]
+        widgets = {
+            "nom": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Nom du document"}
+            ),
+            "fichier": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 2,
+                    "placeholder": "Description (optionnel)",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["nom"].required = False
+        self.fields["fichier"].required = False
+        self.fields["description"].required = False
+
+    def is_empty(self):
+        if not hasattr(self, "cleaned_data"):
+            return True
+        data = self.cleaned_data
+        return not any(
+            [
+                (data.get("nom") or "").strip(),
+                data.get("fichier"),
+                (data.get("description") or "").strip(),
+            ]
+        )
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("DELETE"):
+            return cleaned
+        nom = (cleaned.get("nom") or "").strip()
+        fichier = cleaned.get("fichier")
+        description = (cleaned.get("description") or "").strip()
+        if not nom and not fichier and not description:
+            return cleaned
+        if not nom:
+            self.add_error("nom", "Le nom du document est obligatoire.")
+        if not fichier and not self.instance.pk:
+            self.add_error("fichier", "Le fichier est obligatoire.")
+        cleaned["nom"] = nom
+        cleaned["description"] = description
+        return cleaned
+
+
+class BaseDocumentFormSet(BaseInlineFormSet):
+    def save_new_objects(self, commit=True):
+        self.new_objects = []
+        for form in self.extra_forms:
+            if not hasattr(form, "cleaned_data") or form.is_empty():
+                continue
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            self.new_objects.append(self.save_new(form, commit=commit))
+            if not commit:
+                self.saved_forms.append(form)
+        return self.new_objects
+
+
+DocumentFormSet = inlineformset_factory(
+    Reunion,
+    DocumentReunion,
+    form=DocumentForm,
+    formset=BaseDocumentFormSet,
+    extra=1,
+    max_num=50,
     can_delete=True,
     min_num=0,
     validate_min=False,

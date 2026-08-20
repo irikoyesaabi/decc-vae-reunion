@@ -109,6 +109,12 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Documents de réunions : ./documents/reunions/YYYY/MM/DD/ (racine du projet)
+DOCUMENTS_URL = "/documents/"
+DOCUMENTS_ROOT = (ROOT_DIR / "documents").resolve()
+DOCUMENTS_ROOT.mkdir(parents=True, exist_ok=True)
+(DOCUMENTS_ROOT / "reunions").mkdir(parents=True, exist_ok=True)
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

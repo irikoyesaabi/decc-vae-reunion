@@ -24,25 +24,45 @@
 </form>
 <div class="panel table-wrap">
 <table class="table">
-    <thead><tr><th>Date</th><th>Type</th><th>Lieu</th><th>Président</th><th>Participants</th><th>Points</th><th></th></tr></thead>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Lieu</th>
+            <th>Type</th>
+            <th>Président</th>
+            <th>Participants</th>
+            <th>Points</th>
+            <th>Documents</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
     <tbody>
     {% for r in reunions %}
         <tr>
             <td>{{ r.date|date:"d/m/Y" }}</td>
-            <td>{{ r.get_type_label }}</td>
             <td>{{ r.get_lieu_label }}</td>
+            <td>{{ r.get_type_label }}</td>
             <td>{{ r.president }}</td>
             <td>{{ r.nombre_participants }}</td>
-            <td>{{ r.points.count }}</td>
+            <td>{{ r.nb_points }}</td>
+            <td>
+                {% if r.nb_documents %}
+                <a href="{% url 'documents_reunion' r.pk %}" class="btn btn-sm btn-info text-white" title="Voir les documents">
+                    <i class="bi bi-file-earmark-text"></i> {{ r.nb_documents }}
+                </a>
+                {% else %}
+                <span class="text-muted">-</span>
+                {% endif %}
+            </td>
             <td class="text-nowrap">
-                <a class="btn btn-sm btn-primary" href="{% url 'reunion_detail' r.pk %}"><i class="bi bi-eye"></i> Détail</a>
+                <a class="btn btn-sm btn-primary" href="{% url 'reunion_detail' r.pk %}"><i class="bi bi-eye"></i> Voir</a>
                 <a class="btn btn-sm btn-danger" href="{% url 'export_pdf' r.pk %}"><i class="bi bi-file-pdf"></i> PDF</a>
                 <a class="btn btn-sm btn-primary" href="{% url 'export_word' r.pk %}"><i class="bi bi-file-word"></i> Word</a>
                 <a class="btn btn-sm btn-success" href="{% url 'export_excel' r.pk %}"><i class="bi bi-file-excel"></i> Excel</a>
             </td>
         </tr>
     {% empty %}
-        <tr><td colspan="7">Aucune réunion ne correspond aux critères.</td></tr>
+        <tr><td colspan="8">Aucune réunion ne correspond aux critères.</td></tr>
     {% endfor %}
     </tbody>
 </table>

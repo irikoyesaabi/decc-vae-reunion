@@ -1,6 +1,23 @@
-"""Modèles Reunion et Point — DECC/VAE."""
+"""Modèles Reunion, Point, DocumentReunion et Parametre — DECC/VAE."""
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
+
+
+def document_reunion_upload_to(instance, filename):
+    """Stockage sous ./documents/reunions/YYYY/MM/DD/ (relatif à DOCUMENTS_ROOT)."""
+    from django.utils import timezone
+
+    now = timezone.localtime(timezone.now())
+    return f"reunions/{now:%Y/%m/%d}/{filename}"
+
+
+def documents_storage():
+    """Racine = ./documents/ à la racine du projet portable."""
+    return FileSystemStorage(
+        location=str(settings.DOCUMENTS_ROOT),
+        base_url=settings.DOCUMENTS_URL,
+    )
 
 
 class Reunion(models.Model):
@@ -168,6 +185,42 @@ class Point(models.Model):
             )
             self.numero = (last or 0) + 1
         super().save(*args, **kwargs)
+
+
+class DocumentReunion(models.Model):
+    """Document associé à une réunion (dossier documents/ à la racine du projet)."""
+
+    reunion = models.ForeignKey(
+        Reunion,
+        on_delete=models.CASCADE,
+        related_name="documents",
+        verbose_name="Réunion",
+    )
+    nom = models.CharField(max_length=200, verbose_name="Nom du document")
+    fichier = models.FileField(
+        upload_to=document_reunion_upload_to,
+        storage=documents_storage,
+        verbose_name="Fichier",
+    )
+    description = models.TextField(blank=True, verbose_name="Description")
+    date_ajout = models.DateTimeField(auto_now_add=True, verbose_name="Date d'ajout")
+
+    class Meta:
+        ordering = ["-date_ajout"]
+        verbose_name = "Document de réunion"
+        verbose_name_plural = "Documents de réunion"
+
+    def __str__(self):
+        return f"{self.nom} — {self.reunion.date}"
+
+    @property
+    def taille(self):
+        try:
+            if self.fichier and self.fichier.size:
+                return f"{self.fichier.size // 1024} Ko"
+        except Exception:
+            pass
+        return "0 Ko"
 
 
 class Parametre(models.Model):
