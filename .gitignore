@@ -420,3 +420,27 @@ redist/*.exe
 # Fichiers de verrouillage
 *.lock
 *.lock.*
+
+# Documentation
+documents
+documentation/
+docs/
+doc/
+docs_temp/
+doc_temp/
+docs_backup/
+doc_backup/
+docs_backup_*/
+doc_backup_*/
+docs_backup_*.zip
+doc_backup_*.zip
+docs_backup_*.tar.gz
+doc_backup_*.tar.gz
+docs_backup_*.7z
+doc_backup_*.7z
+docs_backup_*.rar
+doc_backup_*.rar
+docs_backup_*.tar
+doc_backup_*.tar
+docs_backup_*.gz
+doc_backup_*.gz

@@ -1,0 +1,31 @@
+# Fichiers à exclure lors de la copie de la nouvelle version
+# Ces dossiers et fichiers seront IGNORÉS lors de la mise à jour
+
+# Dossiers de données (à conserver)
+decc_vae\data\
+decc_vae\media\
+documents\
+logs\
+python\
+
+# Fichiers de base de données
+*.sqlite3
+*.db
+
+# Fichiers temporaires
+*.log
+*.pyc
+*.pyo
+*.pid
+*.lock
+
+# Dossiers de cache
+__pycache__
+
+# Dossiers de sauvegarde
+backup_*
+backup\
+sauvegarde\
+
+# Dossier de nouvelle version
+new_version
